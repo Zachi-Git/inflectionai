@@ -2,8 +2,9 @@
   "version": 2,
   "name": "inflectionai",
   "builds": [
-    { "src": "index.html",   "use": "@vercel/static" },
-    { "src": "success.html", "use": "@vercel/static" }
+    { "src": "index.html",      "use": "@vercel/static" },
+    { "src": "success.html",    "use": "@vercel/static" },
+    { "src": "translations.js", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/",         "dest": "/index.html" },

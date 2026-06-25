@@ -1864,18 +1864,10 @@ function mobPanel(p){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SCROLL TO LAST N BARS (default 120)
+// SCROLL TO SHOW ALL BARS (fitContent)
 // ═══════════════════════════════════════════════════════════════
 function scrollToLast120(){
-  if (!S.bars || !S.bars.length){ S.chart.timeScale().fitContent(); return; }
-  const prefs = loadPrefs();
-  const n = Math.min(prefs.bars || 120, S.bars.length);
-  try {
-    S.chart.timeScale().setVisibleRange({
-      from: S.bars[S.bars.length - n].time,
-      to:   S.bars[S.bars.length - 1].time,
-    });
-  } catch { S.chart.timeScale().fitContent(); }
+  try { S.chart.timeScale().fitContent(); } catch {}
 }
 
 // ═══════════════════════════════════════════════════════════════

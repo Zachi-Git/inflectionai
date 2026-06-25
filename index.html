@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InflectionAI · Signal Hunter</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script src="translations.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#131722;--surf:#1e222d;--card:#1e222d;--card2:#2a2e39;
+  --bd:#2a2e39;--bd2:#363c4e;
+  --blue:#2962ff;--blue2:#1e53e5;
+  --bull:#089981;--bear:#f23645;
+  --yellow:#F5C518;--pink:#F06292;
+  --warn:#f5a623;--text:#d1d4dc;--t2:#787b86;--t3:#434651;
+  --r:4px;--hh:52px;--fh:28px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:'Trebuchet MS',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:12px;line-height:1.4}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
+input,select,button{font-family:inherit;font-size:12px}
+
+/* HEADER */
+header{height:var(--hh);display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;background:var(--surf);border-bottom:1px solid var(--bd);flex-shrink:0;
+  position:relative;z-index:200}
+.hd-left{display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-mark{width:30px;height:30px;border-radius:var(--r);background:var(--blue);
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.logo-name{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{font-size:10px;color:var(--t2);margin-top:1px}
+.h-tag{padding:2px 8px;border:1px solid var(--bd2);border-radius:2px;
+  font-size:10px;color:var(--t2);white-space:nowrap}
+.hd-right{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--t2)}
+.srv-row{display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot.ok{background:var(--bull)}.dot.err{background:var(--bear)}
+.dot.spin{background:var(--warn);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* LANGUAGE SWITCHER */
+.lang-wrap{position:relative}
+.lang-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;
+  border:1px solid var(--bd2);border-radius:var(--r);background:transparent;
+  color:var(--t2);cursor:pointer;font-size:11px;transition:all .15s}
+.lang-btn:hover{border-color:var(--blue);color:var(--text)}
+.lang-btn .arrow{font-size:8px;opacity:.7}
+.lang-dd{position:absolute;right:0;top:calc(100% + 4px);
+  background:var(--surf);border:1px solid var(--bd2);border-radius:var(--r);
+  min-width:130px;overflow:hidden;display:none;z-index:999;
+  box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.lang-dd.open{display:block}
+.lang-opt{display:flex;align-items:center;gap:8px;padding:7px 12px;
+  cursor:pointer;font-size:11px;color:var(--t2);transition:background .1s;
+  white-space:nowrap}
+.lang-opt:hover{background:var(--card2);color:var(--text)}
+.lang-opt.active{color:var(--blue);background:rgba(41,98,255,.08)}
+.lang-opt .lf{font-size:14px}
+
+/* LAYOUT */
+#wrap{height:calc(100vh - var(--hh) - var(--fh));
+  display:grid;grid-template-columns:238px 1fr 288px;overflow:hidden}
+
+/* PANELS */
+.panel{display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;background:var(--bd)}
+.panel-l{border-right:1px solid var(--bd)}
+.panel-r{border-left:1px solid var(--bd)}
+
+/* CARDS */
+.card{background:var(--card);padding:12px 14px;flex-shrink:0}
+.card+.card{margin-top:1px}
+.card-t{font-size:11px;font-weight:700;color:var(--text);letter-spacing:.2px;
+  margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.card-tag{font-size:9px;font-weight:700;padding:1px 7px;border-radius:2px;
+  background:rgba(41,98,255,.15);color:var(--blue);letter-spacing:.4px}
+.card-tag.live{background:rgba(8,153,129,.15);color:var(--bull)}
+
+/* GAUGE */
+.gauge-wrap{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.gauge-svg-wrap{position:relative;width:84px;height:84px;flex-shrink:0}
+.gauge-svg-wrap svg{transform:rotate(-225deg)}
+.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center}
+.gauge-num{font-size:22px;font-weight:700;line-height:1}
+.gauge-lbl{font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
+.sent-rows{flex:1}
+.sr{display:flex;justify-content:space-between;font-size:11px;
+  padding:2px 0;border-bottom:1px solid var(--bd);color:var(--t2)}
+.sr:last-child{border:none}
+.sr b{font-weight:600}
+
+/* RC */
+.rc-row{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px solid var(--bd);font-size:11px;color:var(--t2)}
+.rc-row:last-child{border:none}
+.rc-val{font-weight:600;color:var(--text)}
+.rc-val.g{color:var(--bull)}.rc-val.r{color:var(--bear)}.rc-val.w{color:var(--warn)}
+.rc-val.y{color:var(--yellow)}.rc-val.p{color:var(--pink)}
+
+/* SIGNAL BOX */
+.sig-box{border:1px solid var(--bd2);border-radius:var(--r);padding:10px 12px;
+  background:var(--card2);transition:all .3s}
+.sig-box.bull{border-color:rgba(245,197,24,.4);background:rgba(245,197,24,.07)}
+.sig-box.bear{border-color:rgba(240,98,146,.4);background:rgba(240,98,146,.07)}
+.sb-lbl{font-size:9px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.sb-val{font-size:16px;font-weight:700;margin-top:4px}
+.sb-val.y{color:var(--yellow)}.sb-val.p{color:var(--pink)}
+.sb-sub{font-size:10px;color:var(--t2);margin-top:2px}
+
+/* STRENGTH BAR */
+.str-bar-wrap{margin-top:6px}
+.str-bar-bg{height:3px;background:var(--bd2);border-radius:2px;overflow:hidden}
+.str-bar-fill{height:100%;border-radius:2px;transition:width .4s;background:var(--yellow)}
+.str-bar-fill.bear{background:var(--pink)}
+
+/* DISCLAIMER */
+.disclaimer-card{border:1px solid rgba(242,150,54,.35);background:rgba(242,150,54,.06);padding:12px 14px}
+.disclaimer-head{font-size:10px;font-weight:800;color:#f29636;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.disclaimer-body{font-size:10px;line-height:1.6;color:var(--t2)}
+.disclaimer-body strong{color:var(--text)}
+
+/* RECENT */
+.log-card{flex-shrink:0}
+#log-mini{max-height:200px;overflow-y:auto;min-height:0}
+.log-item{display:flex;align-items:center;gap:7px;
+  padding:5px 0;border-bottom:1px solid var(--bd);font-size:11px}
+.log-item:last-child{border:none}
+.sig-pill{display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:16px;border-radius:2px;font-size:9px;font-weight:700;flex-shrink:0}
+.sig-pill.B,.sig-pill.eB{background:rgba(245,197,24,.18);color:var(--yellow);
+  border:1px solid rgba(245,197,24,.35)}
+.sig-pill.S,.sig-pill.eS{background:rgba(240,98,146,.18);color:var(--pink);
+  border:1px solid rgba(240,98,146,.35)}
+.log-date{color:var(--t2)}
+.log-price{font-weight:600;margin-left:auto}
+.log-price.y{color:var(--yellow)}.log-price.p{color:var(--pink)}
+
+/* CHART */
+#chart-col{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.chart-hdr{height:44px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 12px;border-bottom:1px solid var(--bd);background:var(--surf);flex-shrink:0}
+.price-block{display:flex;align-items:baseline;gap:8px}
+.sym-lbl{font-size:12px;font-weight:700;color:var(--t2)}
+.price-n{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.price-c{font-size:12px;font-weight:600}
+.price-c.up{color:var(--bull)}.price-c.dn{color:var(--bear)}
+.tf-row{display:flex;align-items:center;gap:2px}
+.tf-btn{padding:3px 8px;border:none;border-radius:var(--r);font-size:11px;font-weight:600;
+  background:transparent;color:var(--t2);cursor:pointer;transition:all .12s}
+.tf-btn:hover{background:var(--card2);color:var(--text)}
+.tf-btn.on{background:var(--blue);color:#fff}
+.chart-boxes{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--bd);gap:1px}
+.cbox{position:relative;background:var(--bg);overflow:hidden}
+.cbox-main{flex:1;min-height:0}.cbox-sub{height:110px;flex-shrink:0}
+#main-chart,#sub-chart{width:100%;height:100%}
+.cbox-tag{position:absolute;top:6px;left:10px;font-size:10px;font-weight:700;
+  color:var(--t2);z-index:5;pointer-events:none;letter-spacing:.3px;
+  display:flex;align-items:center;gap:8px}
+
+/* SHORTCUT HINT */
+.shortcut-hint{position:absolute;bottom:8px;right:12px;font-size:9px;color:var(--t3);
+  pointer-events:none;z-index:5}
+kbd{background:var(--card2);border:1px solid var(--bd2);border-radius:2px;
+  padding:1px 4px;font-size:9px;font-family:inherit}
+
+/* RIGHT */
+.lbl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;
+  letter-spacing:.4px;margin-bottom:5px}
+select,input[type=text],input[type=email]{width:100%;background:var(--card2);
+  border:1px solid var(--bd2);border-radius:var(--r);padding:7px 10px;
+  color:var(--text);outline:none;transition:border-color .15s;-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23787b86'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:26px}
+select:focus,input:focus{border-color:var(--blue)}
+input::placeholder{color:var(--t3)}
+.btn-primary{width:100%;padding:9px;border:none;border-radius:var(--r);
+  background:var(--blue);color:#fff;font-size:12px;font-weight:700;
+  cursor:pointer;transition:background .15s;letter-spacing:.2px}
+.btn-primary:hover{background:var(--blue2)}
+.btn-outline{width:100%;padding:8px;border:1px solid var(--bd2);border-radius:var(--r);
+  background:transparent;color:var(--t2);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .15s;margin-top:5px}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+.tog-row{display:flex;gap:4px}
+.tog{flex:1;padding:5px 4px;border:1px solid var(--bd2);border-radius:var(--r);
+  font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;
+  background:transparent;color:var(--t2);text-align:center}
+.tog.on{background:rgba(41,98,255,.15);border-color:rgba(41,98,255,.4);color:var(--blue)}
+
+/* PLAN GRID */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px}
+.plan-c{background:var(--card2);border:1px solid var(--bd2);border-radius:var(--r);
+  padding:9px 10px;cursor:pointer;transition:all .13s;position:relative}
+.plan-c:hover{border-color:var(--blue)}
+.plan-c.sel{border-color:var(--blue);background:rgba(41,98,255,.1)}
+.plan-name{font-size:9px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.plan-price{font-size:15px;font-weight:700;margin-top:3px}
+.plan-per{font-size:9px;color:var(--t3)}
+.plan-badge{position:absolute;top:-1px;right:-1px;background:var(--yellow);color:#000;
+  font-size:8px;font-weight:800;padding:1px 5px;border-radius:0 var(--r) 0 var(--r)}
+
+.divider{height:1px;background:var(--bd);flex-shrink:0}
+.note{font-size:10px;color:var(--t3);line-height:1.55;margin-top:5px}
+
+/* PAYMENT METHOD LOGOS */
+.pay-logos{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pay-logo{height:18px;border-radius:3px;opacity:.7;transition:opacity .15s;cursor:default}
+.pay-logo:hover{opacity:1}
+
+/* LOADING */
+#ov{position:fixed;inset:0;background:rgba(19,23,34,.82);display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:12px;
+  z-index:999;backdrop-filter:blur(4px)}
+#ov.show{display:flex}
+.spin{width:28px;height:28px;border:2px solid rgba(41,98,255,.2);
+  border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+  background:#1a0f14;border:1px solid rgba(242,54,69,.35);color:var(--bear);
+  padding:8px 18px;border-radius:var(--r);font-size:11px;z-index:999;display:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);white-space:pre-line;text-align:center;
+  max-width:360px}
+#toast.show{display:block}
+#toast.ok{background:#0a1810;border-color:rgba(8,153,129,.35);color:var(--bull)}
+
+/* MODAL BASE */
+.modal-bg{display:none;position:fixed;inset:0;z-index:900;
+  background:rgba(19,23,34,.88);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:16px}
+.modal-box{background:var(--surf);border:1px solid var(--bd2);border-radius:8px;
+  width:460px;max-width:100%;position:relative;overflow:hidden}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;
+  color:var(--t2);font-size:18px;cursor:pointer;z-index:10;line-height:1}
+.modal-close:hover{color:var(--text)}
+
+/* SUBSCRIBE MODAL */
+#sub-modal{padding-bottom:0}
+.sub-head{padding:24px 24px 0}
+.sub-title{font-size:20px;font-weight:800;margin-bottom:3px}
+.sub-subtitle{font-size:11px;color:var(--t2);margin-bottom:18px}
+
+/* PLAN SELECTOR in modal */
+.modal-plans{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  padding:0 24px;margin-bottom:16px}
+.mp{background:var(--card2);border:1px solid var(--bd2);border-radius:var(--r);
+  padding:8px 6px;cursor:pointer;transition:all .13s;text-align:center;position:relative}
+.mp:hover{border-color:var(--blue)}
+.mp.sel{border-color:var(--blue);background:rgba(41,98,255,.1)}
+.mp-name{font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.3px}
+.mp-price{font-size:16px;font-weight:800;margin-top:2px}
+.mp-per{font-size:9px;color:var(--t3)}
+.mp-badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  background:var(--yellow);color:#000;font-size:8px;font-weight:800;
+  padding:1px 6px;border-radius:2px;white-space:nowrap}
+
+/* PAY TABS */
+.pay-tabs{display:flex;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)}
+.pay-tab{flex:1;padding:9px 6px;text-align:center;font-size:11px;font-weight:600;
+  color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .15s;background:none;border-top:none;border-left:none;border-right:none}
+.pay-tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.pay-tab:hover{color:var(--text)}
+
+/* PAY PANELS */
+.pay-panel{display:none;padding:16px 24px 20px}
+.pay-panel.on{display:block}
+.pay-email-row{margin-bottom:12px}
+.pay-email-lbl{font-size:10px;color:var(--t2);font-weight:600;margin-bottom:4px}
+
+/* PayPal button container */
+#paypal-btn-container{min-height:40px}
+
+/* USDT panel */
+.usdt-addr-box{background:var(--card2);border:1px solid var(--bd2);
+  border-radius:var(--r);padding:10px 12px;margin-top:8px}
+.usdt-addr-lbl{font-size:9px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.usdt-addr{font-family:monospace;font-size:11px;color:var(--yellow);
+  word-break:break-all;margin-top:4px;line-height:1.5}
+.usdt-copy-btn{margin-top:8px;width:100%;padding:7px;border:1px solid var(--bd2);
+  border-radius:var(--r);background:transparent;color:var(--t2);font-size:11px;
+  font-weight:600;cursor:pointer;transition:all .15s}
+.usdt-copy-btn:hover{border-color:var(--yellow);color:var(--yellow)}
+.usdt-note{font-size:10px;color:var(--t3);margin-top:8px;line-height:1.5}
+
+/* Other methods (coming soon) */
+.other-methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px 24px 20px}
+.other-btn{display:flex;align-items:center;gap:8px;padding:10px 12px;
+  border:1px solid var(--bd2);border-radius:var(--r);background:var(--card2);
+  cursor:pointer;font-size:11px;font-weight:600;color:var(--t2);
+  transition:all .13s;position:relative;opacity:.7}
+.other-btn:hover{border-color:var(--blue);opacity:1;color:var(--text)}
+.other-btn .ob-icon{font-size:18px}
+.other-soon{position:absolute;top:-1px;right:-1px;font-size:8px;font-weight:700;
+  background:var(--bd2);color:var(--t2);padding:1px 5px;
+  border-radius:0 var(--r) 0 3px}
+
+/* Secure note */
+.pay-secure{display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 24px 16px;font-size:10px;color:var(--t3)}
+
+/* FOOTER */
+footer{height:var(--fh);display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;border-top:1px solid var(--bd);background:var(--surf);
+  font-size:10px;color:var(--t3);flex-shrink:0}
+footer a{color:var(--t3);text-decoration:none}
+footer a:hover{color:var(--t2)}
+
+/* ═══ LIGHT THEME ════════════════════════════════════════════ */
+body.light{
+  --bg:#f0f3fa;--surf:#ffffff;--card:#ffffff;--card2:#e8ecf5;
+  --bd:#dde1ec;--bd2:#c8cfe0;
+  --text:#131722;--t2:#5d6378;--t3:#9ca3b0;
+}
+body.light .gauge-svg-wrap svg circle:first-child{stroke:rgba(0,0,0,.07)}
+body.light #main-chart,body.light #sub-chart{filter:none}
+
+/* THEME TOGGLE */
+.theme-btn{width:30px;height:30px;border:1px solid var(--bd2);border-radius:var(--r);
+  background:transparent;color:var(--t2);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+.theme-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ═══ SIGNAL ALERT BANNER (TrendSpider) ══════════════════════ */
+#sig-banner{display:none;align-items:center;justify-content:space-between;
+  padding:6px 14px;font-size:11px;font-weight:600;flex-shrink:0;
+  border-bottom:1px solid;animation:fadeSlide .3s ease}
+#sig-banner.bull{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.3);color:var(--yellow)}
+#sig-banner.bear{background:rgba(240,98,146,.1);border-color:rgba(240,98,146,.3);color:var(--pink)}
+#sig-banner.show{display:flex}
+#sig-banner .banner-close{background:none;border:none;cursor:pointer;color:inherit;opacity:.6;font-size:14px;padding:0}
+#sig-banner .banner-close:hover{opacity:1}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ OHLCV CROSSHAIR ROW (TradingView) ═════════════════════ */
+#ohlcv-row{display:none;align-items:center;gap:14px;font-size:10px;flex-shrink:0;
+  padding:4px 14px;background:var(--surf);border-bottom:1px solid var(--bd)}
+#ohlcv-row.show{display:flex}
+.ohlcv-item{display:flex;align-items:center;gap:4px;color:var(--t2)}
+.ohlcv-item span{font-weight:600;color:var(--text)}
+.ohlcv-sig{margin-left:auto;font-weight:700;padding:1px 7px;border-radius:2px}
+.ohlcv-sig.B,.ohlcv-sig.eB{background:rgba(245,197,24,.2);color:var(--yellow)}
+.ohlcv-sig.S,.ohlcv-sig.eS{background:rgba(240,98,146,.2);color:var(--pink)}
+
+/* ═══ QUICK SYMBOL CHIPS (Koyfin) ════════════════════════════ */
+.sym-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.chip{padding:3px 8px;border:1px solid var(--bd2);border-radius:12px;
+  font-size:10px;font-weight:600;color:var(--t2);cursor:pointer;
+  background:transparent;transition:all .12s;white-space:nowrap}
+.chip:hover{border-color:var(--blue);color:var(--blue);background:rgba(41,98,255,.07)}
+.chip.active{border-color:var(--blue);color:var(--blue);background:rgba(41,98,255,.12)}
+
+/* ═══ WATCHLIST (TrendSpider Smart Watchlist) ════════════════ */
+.wl-row{display:flex;align-items:center;gap:6px;padding:5px 0;
+  border-bottom:1px solid var(--bd);cursor:pointer;font-size:11px;
+  transition:background .1s;margin:0 -14px;padding:5px 14px}
+.wl-row:last-child{border:none}
+.wl-row:hover{background:rgba(255,255,255,.03)}
+.wl-sym{font-weight:700;min-width:42px;color:var(--text)}
+.wl-price{color:var(--text);font-weight:600}
+.wl-chg{font-size:10px;min-width:44px;text-align:right}
+.wl-chg.up{color:var(--bull)}.wl-chg.dn{color:var(--bear)}
+.wl-sig{margin-left:auto;font-size:9px;font-weight:700;padding:1px 5px;
+  border-radius:2px;flex-shrink:0}
+.wl-sig.B,.wl-sig.eB{background:rgba(245,197,24,.2);color:var(--yellow);
+  border:1px solid rgba(245,197,24,.3)}
+.wl-sig.S,.wl-sig.eS{background:rgba(240,98,146,.2);color:var(--pink);
+  border:1px solid rgba(240,98,146,.3)}
+.wl-sig.none{color:var(--t3)}
+.wl-add-row{display:flex;gap:5px;margin-top:8px}
+.wl-input{flex:1;padding:5px 8px;font-size:11px}
+.wl-add-btn{padding:5px 10px;border:1px solid var(--bd2);border-radius:var(--r);
+  background:transparent;color:var(--t2);cursor:pointer;font-size:11px;font-weight:700;
+  transition:all .12s;white-space:nowrap}
+.wl-add-btn:hover{border-color:var(--blue);color:var(--blue)}
+.wl-empty{color:var(--t3);font-size:11px;padding:6px 0}
+
+/* ═══ MOBILE (< 768px) ══════════════════════════════════════ */
+@media(max-width:768px){
+  #wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;
+    height:calc(100vh - var(--hh) - var(--fh) - 48px)}
+  .panel-l{display:none}.panel-r{display:none}
+  #chart-col{order:1}
+  .mob-nav{display:flex!important}
+  .sym-chips{gap:3px}
+  .chart-hdr{flex-wrap:wrap;height:auto;padding:6px 10px;gap:6px}
+  .tf-row{flex-wrap:wrap}
+}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;
+  height:48px;background:var(--surf);border-top:1px solid var(--bd);
+  z-index:300;align-items:center;justify-content:space-around}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;font-size:9px;color:var(--t2);cursor:pointer;height:100%;border:none;background:none}
+.mob-nav-btn.active{color:var(--blue)}
+.mob-nav-btn .mn-icon{font-size:16px}
+
+/* ═══ DRAWING TOOLBAR ════════════════════════════════════════ */
+.chart-hdr{height:auto!important;min-height:44px;flex-wrap:wrap;gap:6px;padding:6px 12px}
+.draw-toolbar{display:flex;align-items:center;gap:2px;background:var(--card2);
+  border:1px solid var(--bd2);border-radius:var(--r);padding:3px;margin-left:auto;flex-shrink:0}
+.draw-btn{width:26px;height:26px;border:none;border-radius:3px;background:transparent;
+  color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .12s;flex-shrink:0;position:relative}
+.draw-btn:hover{background:var(--bd2);color:var(--text)}
+.draw-btn.on{background:rgba(41,98,255,.18);color:var(--blue)}
+.draw-btn svg{width:14px;height:14px;pointer-events:none}
+.draw-sep{width:1px;height:18px;background:var(--bd2);margin:0 2px;flex-shrink:0}
+.draw-tip{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);
+  background:var(--card2);border:1px solid var(--bd2);border-radius:3px;
+  font-size:9px;white-space:nowrap;padding:2px 5px;pointer-events:none;display:none;z-index:100}
+.draw-btn:hover .draw-tip{display:block}
+
+/* ═══ EXTENDED OHLCV ROW ═════════════════════════════════════ */
+#ohlcv-row{gap:10px;padding:4px 14px;font-size:10px}
+.ohlcv-sep{width:1px;height:14px;background:var(--bd2);flex-shrink:0}
+#ov-chgamt,#ov-chgpct{font-weight:600}
+
+/* ═══ VOL SUB-CHART INFO ════════════════════════════════════= */
+#vol-crosshair-info{font-size:9px;color:var(--text);font-weight:600;margin-left:6px;opacity:.9}
+
+/* ═══ USER BUTTON & PANEL ════════════════════════════════════ */
+.user-wrap{position:relative}
+.user-btn{width:32px;height:32px;border:2px solid rgba(41,98,255,.4);border-radius:50%;
+  background:linear-gradient(135deg,#1e3a5f 0%,#2962ff 100%);
+  cursor:pointer;display:flex;align-items:center;
+  justify-content:center;transition:all .2s;overflow:hidden;position:relative;flex-shrink:0;padding:0}
+.user-btn:hover{border-color:var(--blue);box-shadow:0 0 0 3px rgba(41,98,255,.2)}
+.user-btn svg{width:20px;height:20px;color:#fff;pointer-events:none}
+.user-pro-dot{position:absolute;bottom:0;right:0;width:9px;height:9px;
+  background:var(--yellow);border-radius:50%;border:1.5px solid var(--surf);display:none}
+.user-pro-dot.show{display:block}
+.user-dd{position:absolute;right:0;top:calc(100% + 8px);width:248px;
+  background:var(--surf);border:1px solid var(--bd2);border-radius:6px;
+  box-shadow:0 8px 28px rgba(0,0,0,.55);display:none;z-index:999;overflow:hidden}
+.user-dd.open{display:block;animation:fadeSlide .2s ease}
+.user-dd-head{padding:14px 16px 12px;background:var(--card2);border-bottom:1px solid var(--bd)}
+.user-dd-name{font-size:13px;font-weight:700;color:var(--text)}
+.user-dd-plan{font-size:10px;color:var(--t2);margin-top:3px}
+.user-dd-plan span{color:var(--blue);cursor:pointer}
+.user-dd-plan span:hover{text-decoration:underline}
+.user-dd-sep{height:1px;background:var(--bd)}
+.user-dd-section{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;
+  letter-spacing:.6px;padding:10px 16px 4px}
+.user-pref-row{padding:5px 16px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px}
+.user-pref-row label{font-size:10px;color:var(--t2);white-space:nowrap;
+  flex-shrink:0;min-width:88px}
+.user-pref-row input[type=text],.user-pref-row select,.user-pref-row input[type=number]{
+  width:auto;flex:1;padding:4px 6px;font-size:10px;min-width:0}
+.user-pref-row input[type=checkbox]{width:14px;height:14px;cursor:pointer;
+  accent-color:var(--blue);flex-shrink:0}
+.user-dd-actions{padding:10px 16px 14px;display:flex;flex-direction:column;
+  gap:6px;border-top:1px solid var(--bd);margin-top:4px}
+.ud-save{width:100%;padding:7px;border:none;border-radius:var(--r);
+  background:var(--blue);color:#fff;font-size:11px;font-weight:700;
+  cursor:pointer;transition:background .15s}
+.ud-save:hover{background:var(--blue2)}
+.ud-upgrade{width:100%;padding:6px;border:1px solid rgba(245,197,24,.5);
+  border-radius:var(--r);background:rgba(245,197,24,.08);color:var(--yellow);
+  font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.ud-upgrade:hover{background:rgba(245,197,24,.18)}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="ov"><div class="spin"></div>
+  <div style="font-size:11px;color:var(--t2)" id="ov-txt">Loading…</div></div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ═══ SUBSCRIBE MODAL ══════════════════════════════════════════ -->
+<div class="modal-bg" id="sub-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeSub()">✕</button>
+
+    <div class="sub-head">
+      <div class="sub-title" data-i18n="modalTitle">Subscribe</div>
+      <div class="sub-subtitle" data-i18n="modalSub">Unlock full 5-year history and unlimited signals</div>
+    </div>
+
+    <!-- Plan selector -->
+    <div class="modal-plans">
+      <div class="mp" data-plan="weekly" onclick="selPlan(this)">
+        <div class="mp-name">Weekly</div>
+        <div class="mp-price">$4.90</div>
+        <div class="mp-per">/ week</div>
+      </div>
+      <div class="mp sel" data-plan="monthly" onclick="selPlan(this)">
+        <div class="mp-badge">★ BEST</div>
+        <div class="mp-name">Monthly</div>
+        <div class="mp-price">$19.90</div>
+        <div class="mp-per">/ month</div>
+      </div>
+      <div class="mp" data-plan="quarterly" onclick="selPlan(this)">
+        <div class="mp-name">Quarterly</div>
+        <div class="mp-price">$49.90</div>
+        <div class="mp-per">3 months</div>
+      </div>
+      <div class="mp" data-plan="yearly" onclick="selPlan(this)">
+        <div class="mp-name">Yearly</div>
+        <div class="mp-price">$189</div>
+        <div class="mp-per">save 21%</div>
+      </div>
+    </div>
+
+    <!-- Payment tabs -->
+    <div class="pay-tabs">
+      <button class="pay-tab on"  onclick="setPayTab('paypal',this)">PayPal</button>
+      <button class="pay-tab"     onclick="setPayTab('usdt',this)">USDT</button>
+      <button class="pay-tab"     onclick="setPayTab('card',this)">💳 Card</button>
+      <button class="pay-tab"     onclick="setPayTab('alipay',this)">支付宝 / 微信</button>
+    </div>
+
+    <!-- ── PayPal panel ── -->
+    <div class="pay-panel on" id="panel-paypal">
+      <div class="pay-email-row">
+        <div class="pay-email-lbl">Email</div>
+        <input type="email" id="sub-email" placeholder="your@email.com">
+      </div>
+      <!-- PayPal JS SDK renders here; fallback button shows until SDK loads -->
+      <div id="paypal-btn-container" style="min-height:44px">
+        <button class="btn-primary" id="paypal-fallback-btn" onclick="loadPayPalSDK()">
+          Pay with PayPal
+        </button>
+      </div>
+      <div id="paypal-status" style="font-size:11px;color:var(--t2);margin-top:6px"></div>
+      <div class="pay-secure">🔒 Secure · Cancel anytime</div>
+    </div>
+
+    <!-- ── USDT panel ── -->
+    <div class="pay-panel" id="panel-usdt">
+      <div class="pay-email-row">
+        <div class="pay-email-lbl">Email</div>
+        <input type="email" id="sub-email-usdt" placeholder="your@email.com">
+      </div>
+      <button class="btn-primary" onclick="showUSDTWallet()">Get USDT Wallet Address</button>
+
+      <div id="usdt-result" style="display:none;margin-top:10px">
+        <!-- QR + address -->
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <img id="usdt-qr" src="" alt="QR" width="100" height="100"
+               style="border-radius:6px;border:1px solid var(--bd2);flex-shrink:0">
+          <div style="flex:1;min-width:0">
+            <div class="usdt-addr-lbl">Send exactly <strong id="usdt-amount-display" style="color:var(--yellow)">—</strong> USDT (TRC20)</div>
+            <div class="usdt-addr" id="usdt-addr" style="margin-top:4px;word-break:break-all">—</div>
+            <button class="usdt-copy-btn" onclick="copyUSDTAddr()" style="margin-top:6px">📋 Copy Address</button>
+          </div>
+        </div>
+        <div class="usdt-note" style="margin-top:8px">
+          ⚠ TRC20 network only. After sending, paste your TX hash below for verification.
+        </div>
+        <!-- TX hash submission -->
+        <div class="pay-email-row" style="margin-top:8px">
+          <div class="pay-email-lbl">TX Hash</div>
+          <input type="text" id="usdt-tx-input" placeholder="Paste your transaction hash…" style="font-family:monospace;font-size:11px">
+        </div>
+        <button class="btn-primary" onclick="submitUSDTTx()" style="margin-top:6px">✅ Submit TX for Verification</button>
+        <div id="usdt-submit-status" style="font-size:11px;margin-top:6px;color:var(--t2)"></div>
+      </div>
+      <div class="pay-secure" style="margin-top:10px">🔒 Verified within 24h · Email confirmation</div>
+    </div>
+
+    <!-- ── Card (Stripe) panel ── -->
+    <div class="pay-panel" id="panel-card">
+      <div class="pay-email-row">
+        <div class="pay-email-lbl">Email</div>
+        <input type="email" id="sub-email-card" placeholder="your@email.com">
+      </div>
+      <button class="btn-primary" onclick="startStripeCheckout()">
+        💳 Pay with Card (Stripe)
+      </button>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center">
+        <span style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 7px;border-radius:3px">VISA</span>
+        <span style="font-size:11px">💳 Mastercard</span>
+        <span style="font-size:11px">🍎 Apple Pay</span>
+        <span style="font-size:11px">🟦 Google Pay</span>
+        <span style="font-size:11px">🇺🇸 Amex</span>
+      </div>
+      <div class="pay-secure" style="margin-top:8px">🔒 Powered by Stripe · 256-bit SSL</div>
+      <div id="card-status" style="font-size:11px;color:var(--t2);margin-top:4px"></div>
+    </div>
+
+    <!-- ── Alipay / WeChat panel ── -->
+    <div class="pay-panel" id="panel-alipay">
+      <div class="pay-email-row">
+        <div class="pay-email-lbl">Email</div>
+        <input type="email" id="sub-email-alipay" placeholder="your@email.com">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+        <button class="btn-primary" onclick="startAlipayCheckout('alipay')"
+                style="background:linear-gradient(135deg,#1677FF,#006EFF)">
+          🔵 支付宝 Alipay
+        </button>
+        <button class="btn-primary" onclick="startAlipayCheckout('wechat_pay')"
+                style="background:linear-gradient(135deg,#07C160,#00A050)">
+          🟢 微信 WeChat Pay
+        </button>
+      </div>
+      <div class="pay-secure" style="margin-top:8px">🔒 Powered by Stripe · One-time payment</div>
+      <div id="alipay-status" style="font-size:11px;color:var(--t2);margin-top:4px"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ HEADER ════════════════════════════════════════════════════ -->
+<header>
+  <div class="hd-left">
+    <div class="logo">
+      <div class="logo-mark">⚡</div>
+      <div>
+        <div class="logo-name">InflectionAI</div>
+        <div class="logo-sub" data-i18n="appSub">AI Inflection Decision System</div>
+      </div>
+    </div>
+    <span class="h-tag" data-i18n="tagSignal">Signal Hunter</span>
+    <span class="h-tag" data-i18n="tagAI">AI Signals</span>
+  </div>
+  <div class="hd-right">
+    <div class="srv-row">
+      <div class="dot spin" id="srv-dot"></div>
+      <span id="srv-txt" data-i18n="srvConnecting">Connecting…</span>
+    </div>
+    <!-- Language Switcher -->
+    <div class="lang-wrap" id="lang-wrap">
+      <button class="lang-btn" onclick="toggleLangDD()">
+        <span id="lang-flag">🇺🇸</span>
+        <span id="lang-label">EN</span>
+        <span class="arrow">▾</span>
+      </button>
+      <div class="lang-dd" id="lang-dd">
+        <div class="lang-opt active" data-lang="en" onclick="changeLang('en')"><span class="lf">🇺🇸</span>English</div>
+        <div class="lang-opt" data-lang="zh" onclick="changeLang('zh')"><span class="lf">🇨🇳</span>中文</div>
+        <div class="lang-opt" data-lang="ko" onclick="changeLang('ko')"><span class="lf">🇰🇷</span>한국어</div>
+        <div class="lang-opt" data-lang="ja" onclick="changeLang('ja')"><span class="lf">🇯🇵</span>日本語</div>
+        <div class="lang-opt" data-lang="es" onclick="changeLang('es')"><span class="lf">🇪🇸</span>Español</div>
+      </div>
+    </div>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
+    <!-- User Button -->
+    <div class="user-wrap" id="user-wrap">
+      <button class="user-btn" onclick="toggleUserPanel()" id="user-btn" title="用户设置 · Settings">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <div class="user-pro-dot" id="user-pro-dot"></div>
+      </button>
+      <div class="user-dd" id="user-dd">
+        <div class="user-dd-head">
+          <div class="user-dd-name" id="user-dd-name">Guest</div>
+          <div class="user-dd-plan">
+            <span id="user-plan-tag">FREE Plan</span>
+            &nbsp;·&nbsp;<span onclick="openSub();closeUserPanel()">Upgrade →</span>
+          </div>
+        </div>
+        <div class="user-dd-sep"></div>
+        <div class="user-dd-section">偏好设置 · Preferences</div>
+        <div class="user-pref-row">
+          <label>Default Symbol</label>
+          <input type="text" id="pref-sym" value="TSLA" style="width:72px">
+        </div>
+        <div class="user-pref-row">
+          <label>Default TF</label>
+          <select id="pref-tf">
+            <option value="5m">5m</option><option value="15m">15m</option>
+            <option value="30m">30m</option><option value="1h">1h</option>
+            <option value="4h">4h</option><option value="1d" selected>1D</option>
+            <option value="1w">1W</option><option value="1M">1M</option><option value="1Y">1Y</option>
+          </select>
+        </div>
+        <div class="user-pref-row">
+          <label>Initial Bars</label>
+          <input type="number" id="pref-bars" value="120" min="30" max="500" style="width:60px">
+        </div>
+        <div class="user-pref-row">
+          <label>Signal Banner</label>
+          <input type="checkbox" id="pref-banner" checked>
+        </div>
+        <div class="user-pref-row">
+          <label>Auto-load on start</label>
+          <input type="checkbox" id="pref-autoload" checked>
+        </div>
+        <div class="user-dd-actions">
+          <button class="ud-save" onclick="savePrefs()">💾 Save Settings</button>
+          <button class="ud-upgrade" onclick="openSub();closeUserPanel()">⭐ Upgrade to PRO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ 3-COLUMN ══════════════════════════════════════════════════ -->
+<div id="wrap">
+
+  <!-- ══ LEFT ══ -->
+  <div class="panel panel-l">
+
+    <div class="card">
+      <div class="card-t">
+        <span data-i18n="marketPulse">Market Pulse</span>
+        <span class="card-tag live" data-i18n="live">LIVE</span>
+      </div>
+      <div class="gauge-wrap">
+        <div class="gauge-svg-wrap">
+          <svg width="84" height="84" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,.06)"
+              stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6 226.2"/>
+            <circle id="g-arc" cx="50" cy="50" r="36" fill="none" stroke="#089981"
+              stroke-width="7" stroke-linecap="round" stroke-dasharray="0 226.2"
+              style="transition:stroke-dasharray .5s,stroke .5s"/>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-num" id="g-num">—</div>
+            <div class="gauge-lbl">Sentiment</div>
+          </div>
+        </div>
+        <div class="sent-rows">
+          <div class="sr"><span data-i18n="bullish">Bullish</span><b style="color:var(--yellow)" id="s-bull">—</b></div>
+          <div class="sr"><span data-i18n="bearish">Bearish</span><b style="color:var(--pink)" id="s-bear">—</b></div>
+          <div class="sr"><span data-i18n="neutral">Neutral</span><b id="s-neut">—</b></div>
+          <div class="sr"><span data-i18n="netFlow">Net Flow</span><b id="s-flow" style="color:var(--bull)">0</b></div>
+        </div>
+      </div>
+      <div class="note" data-i18n="sentimentNote">Derived from signal history on loaded bars</div>
+    </div>
+
+    <div class="card">
+      <div class="card-t">
+        <span data-i18n="riskCopilot">Risk Copilot</span>
+        <span style="font-size:10px;color:var(--t2);font-weight:400" data-i18n="auto">Auto</span>
+      </div>
+      <div class="rc-row"><span data-i18n="entry">Entry</span><span class="rc-val w" id="rc-e">—</span></div>
+      <div class="rc-row"><span data-i18n="stopLoss">Stop (−2 ATR)</span><span class="rc-val p" id="rc-s">—</span></div>
+      <div class="rc-row"><span data-i18n="target1">Target 1 (+2 ATR)</span><span class="rc-val y" id="rc-t1">—</span></div>
+      <div class="rc-row"><span data-i18n="target2">Target 2 (+4 ATR)</span><span class="rc-val y" id="rc-t2">—</span></div>
+      <div class="rc-row"><span data-i18n="sigStrength">Strength</span><span class="rc-val" id="rc-c">—</span></div>
+      <div class="rc-row"><span data-i18n="backtestWR">Backtest WR</span><span class="rc-val y" id="rc-w">—</span></div>
+    </div>
+
+    <div class="card log-card">
+      <div class="card-t" data-i18n="recentSignals">Recent Signals</div>
+      <div id="log-mini"></div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="card disclaimer-card">
+      <div class="disclaimer-head">⚠ Risk Disclosure</div>
+      <div class="disclaimer-body">
+        The signals and analysis on this platform are for <strong>informational purposes only</strong> and do not constitute financial, investment, or trading advice. Past performance is not indicative of future results. All trading involves substantial risk of loss. You should consult a qualified financial adviser before making any investment decisions. InflectionAI assumes no responsibility for any losses incurred as a result of using this platform.
+      </div>
+    </div>
+
+    <!-- Watchlist — TrendSpider Smart Watchlist inspired -->
+    <div class="card">
+      <div class="card-t">
+        <span>Watchlist</span>
+        <span class="card-tag" id="wl-count" style="cursor:pointer" onclick="refreshWatchlist()">↻</span>
+      </div>
+      <div id="wl-list"><div class="wl-empty">Add symbols to track signals</div></div>
+      <div class="wl-add-row">
+        <input type="text" class="wl-input" id="wl-in" placeholder="Add symbol…"
+          onkeydown="if(event.key==='Enter')addToWatchlist()">
+        <button class="wl-add-btn" onclick="addToWatchlist()">+ Add</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ CHART ══ -->
+  <div id="chart-col">
+    <!-- Signal Alert Banner — TrendSpider inspired -->
+    <div id="sig-banner">
+      <span id="sig-banner-txt">⚡ New signal detected</span>
+      <button class="banner-close" onclick="document.getElementById('sig-banner').className=''">&times;</button>
+    </div>
+    <!-- OHLCV crosshair row — extended -->
+    <div id="ohlcv-row">
+      <div class="ohlcv-item">O <span id="ov-o">—</span></div>
+      <div class="ohlcv-item">H <span id="ov-h">—</span></div>
+      <div class="ohlcv-item">L <span id="ov-l">—</span></div>
+      <div class="ohlcv-item">C <span id="ov-c">—</span></div>
+      <div class="ohlcv-sep"></div>
+      <div class="ohlcv-item">涨跌 <span id="ov-chgamt">—</span></div>
+      <div class="ohlcv-item"><span id="ov-chgpct">—</span></div>
+      <div class="ohlcv-sep"></div>
+      <div class="ohlcv-item">成交额 <span id="ov-amount">—</span></div>
+      <div class="ohlcv-item">量比 <span id="ov-vratio">—</span></div>
+      <div class="ohlcv-item">Vol <span id="ov-v">—</span></div>
+      <span class="ohlcv-sig" id="ov-sig" style="display:none"></span>
+    </div>
+    <div class="chart-hdr">
+      <div class="price-block">
+        <span class="sym-lbl" id="c-sym">—</span>
+        <span class="price-n" id="c-price">—</span>
+        <span class="price-c" id="c-chg"></span>
+      </div>
+      <!-- Drawing Toolbar (右上角) -->
+      <div class="draw-toolbar" id="draw-toolbar">
+        <!-- Cursor -->
+        <button class="draw-btn on" data-mode="cursor" onclick="setDrawMode('cursor')">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 1.5l9 6.5-4 1.5-1.5 5-3.5-13z"/></svg>
+          <span class="draw-tip">Cursor (V)</span>
+        </button>
+        <div class="draw-sep"></div>
+        <!-- Horizontal Line -->
+        <button class="draw-btn" data-mode="hline" onclick="setDrawMode('hline')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="1" y1="8" x2="15" y2="8"/>
+            <circle cx="1" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="15" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+          </svg>
+          <span class="draw-tip">H-Line (H)</span>
+        </button>
+        <!-- Trend Line -->
+        <button class="draw-btn" data-mode="tline" onclick="setDrawMode('tline')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="2" y1="13" x2="14" y2="3"/>
+            <circle cx="2" cy="13" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="14" cy="3" r="1.5" fill="currentColor" stroke="none"/>
+          </svg>
+          <span class="draw-tip">Trend Line (T)</span>
+        </button>
+        <!-- Rectangle -->
+        <button class="draw-btn" data-mode="rect" onclick="setDrawMode('rect')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="4" width="12" height="8" rx="1"/>
+          </svg>
+          <span class="draw-tip">Rectangle (R)</span>
+        </button>
+        <div class="draw-sep"></div>
+        <!-- Magnet -->
+        <button class="draw-btn" id="draw-magnet" onclick="toggleMagnet()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 3v4a4 4 0 008 0V3M4 3h2.5M9.5 3H12M4 11v2M12 11v2"/>
+          </svg>
+          <span class="draw-tip">Magnet (M)</span>
+        </button>
+        <!-- Undo -->
+        <button class="draw-btn" onclick="undoLastDrawing()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 7c0-3 2.2-5 5-5a5 5 0 015 5v1M3 7l3-3M3 7l3 3"/>
+          </svg>
+          <span class="draw-tip">Undo (⌘Z)</span>
+        </button>
+        <!-- Clear All -->
+        <button class="draw-btn" onclick="clearDrawings()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 4h10M6 4V2h4v2M5 4v9h6V4H5z"/>
+          </svg>
+          <span class="draw-tip">Clear All</span>
+        </button>
+      </div>
+    </div>
+    <div class="chart-boxes">
+      <div class="cbox cbox-main">
+        <div class="cbox-tag">
+          <span id="ct-tag">— · 1D</span>
+        </div>
+        <div class="shortcut-hint"><kbd>/</kbd> focus · <kbd>Enter</kbd> load · <kbd>R</kbd> reset</div>
+        <div id="main-chart"></div>
+      </div>
+      <div class="cbox cbox-sub">
+        <div class="cbox-tag">
+          <span data-i18n="volume">Volume</span>
+          <span style="color:var(--yellow);font-size:9px">━ <span data-i18n="maLabel">10D MA</span></span>
+          <span id="vol-crosshair-info"></span>
+        </div>
+        <div id="sub-chart"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT ══ -->
+  <div class="panel panel-r">
+
+    <div class="card">
+      <div class="card-t" data-i18n="controlCenter">Control Center</div>
+      <div class="lbl" data-i18n="symbolLabel">Symbol</div>
+      <div style="display:flex;gap:5px;margin-bottom:6px">
+        <input type="text" id="sym-in" value="TSLA" data-i18n-ph="symPlaceholder"
+          onkeydown="if(event.key==='Enter')loadSymbol()"
+          style="flex:1;margin-bottom:0">
+        <button class="btn-primary" onclick="loadSymbol()" style="width:auto;padding:7px 12px">→</button>
+      </div>
+      <!-- Quick symbol chips — Koyfin inspired -->
+      <div class="sym-chips" id="sym-chips">
+        <button class="chip" onclick="quickLoad('TSLA')">TSLA</button>
+        <button class="chip" onclick="quickLoad('AAPL')">AAPL</button>
+        <button class="chip" onclick="quickLoad('NVDA')">NVDA</button>
+        <button class="chip" onclick="quickLoad('SPY')">SPY</button>
+        <button class="chip" onclick="quickLoad('MSFT')">MSFT</button>
+        <button class="chip" onclick="quickLoad('BTC-USD')">BTC</button>
+        <button class="chip" onclick="quickLoad('GOOGL')">GOOGL</button>
+        <button class="chip" onclick="quickLoad('META')">META</button>
+      </div>
+      <div class="lbl" data-i18n="timeframe">Timeframe</div>
+      <select id="tf-sel" onchange="setTF(this.value);loadSymbol()" style="margin-bottom:10px">
+        <option value="5m">5m</option>
+        <option value="15m">15m</option>
+        <option value="30m">30m</option>
+        <option value="1h">1h</option>
+        <option value="4h">4h</option>
+        <option value="1d" selected>1D</option>
+        <option value="1w">1W</option>
+        <option value="1M">1M</option>
+        <option value="1Y">1Y</option>
+      </select>
+      <div class="lbl" data-i18n="indicators">Indicators</div>
+      <div class="tog-row" style="margin-bottom:10px">
+        <button class="tog on" id="tog-eb" onclick="toggleSig('eB')">eB / eS</button>
+        <button class="tog on" id="tog-b"  onclick="toggleSig('B')">B / S</button>
+      </div>
+      <button class="btn-primary" onclick="loadSymbol()" data-i18n="loadChart">Load Chart</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card">
+      <div class="card-t">
+        <span data-i18n="subscription">Subscription</span>
+        <span class="card-tag" id="sub-tag">FREE</span>
+      </div>
+      <div class="plan-grid">
+        <div class="plan-c" data-plan="weekly" onclick="planClick(this)">
+          <div class="plan-name" data-i18n="planWeekly">Weekly</div>
+          <div class="plan-price">$4.90</div>
+          <div class="plan-per" data-i18n="perWeek">/ week</div>
+        </div>
+        <div class="plan-c sel" data-plan="monthly" onclick="planClick(this)">
+          <div class="plan-badge">★</div>
+          <div class="plan-name" data-i18n="planMonthly">Monthly</div>
+          <div class="plan-price">$19.90</div>
+          <div class="plan-per" data-i18n="perMonth">/ month</div>
+        </div>
+        <div class="plan-c" data-plan="quarterly" onclick="planClick(this)">
+          <div class="plan-name" data-i18n="planQuarterly">Quarterly</div>
+          <div class="plan-price">$49.90</div>
+          <div class="plan-per" data-i18n="per3Month">3 months</div>
+        </div>
+        <div class="plan-c" data-plan="yearly" onclick="planClick(this)">
+          <div class="plan-name" data-i18n="planYearly">Yearly 🔥</div>
+          <div class="plan-price">$189</div>
+          <div class="plan-per" data-i18n="saveLabel">save 21%</div>
+        </div>
+      </div>
+      <!-- Payment logos -->
+      <div class="pay-logos">
+        <span title="PayPal" style="font-size:18px;cursor:default">🅿️</span>
+        <span title="USDT Crypto" style="font-size:18px;cursor:default">₮</span>
+        <span title="Visa" style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px">VISA</span>
+        <span title="Mastercard" style="font-size:16px">💳</span>
+        <span title="Alipay 支付宝" style="color:#1677FF;font-size:12px;font-weight:700">支付宝</span>
+        <span title="WeChat Pay 微信" style="color:#07C160;font-size:12px;font-weight:700">微信</span>
+      </div>
+      <button class="btn-primary" style="margin-top:8px" onclick="openSub()" data-i18n="subscribeCTA">Subscribe Now</button>
+      <button class="btn-outline" onclick="checkMyStatus()" data-i18n="checkStatus">Check Status</button>
+      <div class="note" id="sub-note" data-i18n="subNote">Free tier: ~1yr daily data. Subscribe for 5+ years.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card">
+      <div class="card-t" data-i18n="shareExport">Share &amp; Export</div>
+      <div style="display:flex;gap:5px">
+        <button class="btn-outline" style="margin-top:0;flex:1" onclick="copyLink()" data-i18n="copyLink">Copy Link</button>
+        <button class="btn-outline" style="margin-top:0;flex:1" onclick="exportCSV()" data-i18n="exportCSV">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t" data-i18n="affiliate">Affiliate</div>
+      <button class="btn-outline" style="margin-top:0" data-i18n="affiliateCTA">Join Affiliate Program</button>
+      <div class="note" data-i18n="affiliateNote">Earn commission on every referred subscriber.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-btn" onclick="mobPanel('chart')"><span class="mn-icon">📈</span>Chart</button>
+  <button class="mob-nav-btn" onclick="mobPanel('left')"><span class="mn-icon">📊</span>Signals</button>
+  <button class="mob-nav-btn" onclick="mobPanel('right')"><span class="mn-icon">⚙️</span>Control</button>
+  <button class="mob-nav-btn" onclick="openSub()"><span class="mn-icon">💎</span>Pro</button>
+</nav>
+
+<footer>
+  <span>support@inflectionai.io</span>
+  <div style="display:flex;gap:10px">
+    <a href="#">inflectionai.io</a>
+    <a href="#">Terms</a>
+    <a href="#">Privacy</a>
+  </div>
+</footer>
+
+<script>
+// ── API ──────────────────────────────────────────────────────────
+const API = (location.hostname==='localhost'||location.hostname==='127.0.0.1')
+  ? 'http://localhost:8000' : 'https://inflectionai-api.onrender.com';
+
+// ── STATE ────────────────────────────────────────────────────────
+const S = {
+  sym:'TSLA', tf:'1d',
+  chart:null, candles:null,
+  subChart:null, volHist:null, volMA:null,
+  signals:[], bars:[],
+  showEB:true, showB:true,
+  syncing:false, serverOk:false,
+};
+const YELLOW='#F5C518', PINK='#F06292';
+
+function getLimitForTF(tf){
+  return {'5m':400,'15m':400,'30m':400,'1h':730,'4h':500,'1d':1260,'1w':260,'1M':120,'1Y':252}[tf]||600;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  // i18n init first
+  window.i18n.init();
+  // Load saved preferences
+  const _urlP = new URLSearchParams(location.search);
+  const _prefs = loadPrefs();
+  // URL params override saved prefs
+  const _initSym = _urlP.get('symbol') || _prefs.sym;
+  const _initTF  = _urlP.get('tf') || _prefs.tf;
+  if(_initSym) document.getElementById('sym-in').value = _initSym.toUpperCase();
+  if(_initTF)  setTF(_initTF);
+  if(_urlP.get('lang')) window.i18n.setLang(_urlP.get('lang'));
+  // Apply EMA prefs to initial state
+  // EMA prefs removed
+  // Theme first (no DOM size deps)
+  applyTheme();
+  // Mobile nav
+  if (window.innerWidth <= 768) mobPanel('chart');
+  // Close dropdowns on outside click
+  document.addEventListener('click',e=>{
+    if(!document.getElementById('lang-wrap').contains(e.target))
+      document.getElementById('lang-dd').classList.remove('open');
+    if(!document.getElementById('user-wrap').contains(e.target))
+      document.getElementById('user-dd').classList.remove('open');
+  });
+  // FIX: defer chart init to next frame so browser has computed layout
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{          // double-rAF ensures paint+layout done
+      initCharts();
+      bindTF();
+      bindKeyboard();
+      bindCrosshair();
+      bindDrawingClick();
+      // Server + main chart load
+      if(_prefs.autoload !== false) checkServer().then(()=>loadSymbol());
+      else checkServer();
+      checkReturnFromStripe();
+      // Pre-load PayPal SDK in background (non-blocking, 3s delay)
+      setTimeout(()=>loadPayPalSDK().catch(()=>{}), 3000);
+      // Watchlist — delay 3s so it doesn't compete with main loadSymbol()
+      renderWatchlist();
+      setTimeout(()=>{
+        refreshWatchlist();
+        setInterval(refreshWatchlist, 5 * 60 * 1000);
+      }, 3000);
+    });
+  });
+});
+
+// ── LANGUAGE ─────────────────────────────────────────────────────
+const LANG_FLAGS={en:'🇺🇸',zh:'🇨🇳',ko:'🇰🇷',ja:'🇯🇵',es:'🇪🇸'};
+const LANG_LABELS={en:'EN',zh:'中文',ko:'한국어',ja:'日本語',es:'ES'};
+
+function toggleLangDD(){
+  document.getElementById('lang-dd').classList.toggle('open');
+}
+function changeLang(lang){
+  window.i18n.setLang(lang);
+  document.getElementById('lang-flag').textContent = LANG_FLAGS[lang]||'🌐';
+  document.getElementById('lang-label').textContent = LANG_LABELS[lang]||lang.toUpperCase();
+  document.getElementById('lang-dd').classList.remove('open');
+  // Re-apply server status text
+  const ok = S.serverOk;
+  document.getElementById('srv-txt').textContent = window.i18n.t(ok?'srvOnline':'srvOffline');
+}
+
+// ── SERVER CHECK ─────────────────────────────────────────────────
+async function checkServer(){
+  try{
+    const r=await fetch(`${API}/api/health`,{signal:AbortSignal.timeout(4000)});
+    if(r.ok){setSrv(true);S.serverOk=true;_clearRetry();}else throw 0;
+  }catch{
+    setSrv(false);S.serverOk=false;
+    _scheduleRetry();
+  }
+}
+let _retryTimer=null;
+function _scheduleRetry(){
+  if(_retryTimer) return;           // already scheduled
+  let attempt=0;
+  _retryTimer=setInterval(async()=>{
+    attempt++;
+    try{
+      const r=await fetch(`${API}/api/health`,{signal:AbortSignal.timeout(3000)});
+      if(r.ok){
+        S.serverOk=true;setSrv(true);_clearRetry();
+        loadSymbol();               // auto-load on reconnect
+      }
+    }catch{}
+    if(attempt>=20) _clearRetry(); // give up after ~60s
+  },3000);
+}
+function _clearRetry(){if(_retryTimer){clearInterval(_retryTimer);_retryTimer=null;}}
+function setSrv(ok,customMsg){
+  document.getElementById('srv-dot').className='dot '+(ok?'ok':'err');
+  document.getElementById('srv-txt').textContent = customMsg || window.i18n.t(ok?'srvOnline':'srvOffline');
+}
+
+// ── KEYBOARD SHORTCUTS ───────────────────────────────────────────
+function bindKeyboard(){
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+    if(e.key==='/'){e.preventDefault();document.getElementById('sym-in').focus();}
+    if(e.key==='r'||e.key==='R') loadSymbol();
+    if(e.key==='Escape'){ closeSub(); setDrawMode('cursor'); closeUserPanel(); }
+    // Drawing shortcuts
+    if(e.key==='v'||e.key==='V') setDrawMode('cursor');
+    if(e.key==='h'||e.key==='H') setDrawMode('hline');
+    if(e.key==='t'||e.key==='T') setDrawMode('tline');
+    if(e.key==='m'||e.key==='M') toggleMagnet();
+    if((e.key==='z'||e.key==='Z')&&(e.ctrlKey||e.metaKey)){e.preventDefault();undoLastDrawing();}
+  });
+}
+
+// ── CHARTS INIT ──────────────────────────────────────────────────
+function initCharts(){
+  const base={
+    layout:{background:{color:'transparent'},textColor:'#787b86'},
+    grid:{vertLines:{color:'rgba(42,46,57,.6)'},horzLines:{color:'rgba(42,46,57,.6)'}},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
+    rightPriceScale:{borderColor:'#2a2e39'},
+    timeScale:{borderColor:'#2a2e39',timeVisible:true,secondsVisible:false},
+    handleScroll:true,handleScale:true,
+  };
+  const mEl=document.getElementById('main-chart');
+  // FIX: ensure container has real dimensions before creating chart
+  // Use clientWidth/clientHeight as fallback; getBoundingClientRect is most reliable
+  const mRect=mEl.getBoundingClientRect();
+  const mW=mRect.width||mEl.clientWidth||mEl.parentElement.clientWidth||800;
+  const mH=mRect.height||mEl.clientHeight||mEl.parentElement.clientHeight||400;
+  // Fixed price scale width = 70px on both charts → identical content widths → crosshair lines up
+  const PSCALE_W = 70;
+  S.chart=LightweightCharts.createChart(mEl,{...base,width:mW,height:mH,
+    rightPriceScale:{...base.rightPriceScale,width:PSCALE_W}});
+  S.candles=S.chart.addCandlestickSeries({
+    upColor:'#089981',downColor:'#f23645',
+    borderUpColor:'#089981',borderDownColor:'#f23645',
+    wickUpColor:'#089981',wickDownColor:'#f23645',
+  });
+  const sEl=document.getElementById('sub-chart');
+  const sRect=sEl.getBoundingClientRect();
+  const sW=sRect.width||sEl.clientWidth||sEl.parentElement.clientWidth||800;
+  const sH=sRect.height||sEl.clientHeight||sEl.parentElement.clientHeight||110;
+  S.subChart=LightweightCharts.createChart(sEl,{...base,
+    width:sW,height:sH,
+    timeScale:{...base.timeScale,visible:false},
+    rightPriceScale:{...base.rightPriceScale,scaleMargins:{top:.1,bottom:.1},width:PSCALE_W},
+  });
+  S.volHist=S.subChart.addHistogramSeries({priceLineVisible:false,lastValueVisible:false,priceFormat:{type:'volume'}});
+  S.volMA=S.subChart.addLineSeries({color:YELLOW,lineWidth:1.5,priceLineVisible:false,lastValueVisible:false});
+  // Sync by logical range (index-based) — more precise than time range for crosshair alignment
+  S.chart.timeScale().subscribeVisibleLogicalRangeChange(r=>{
+    if(!S.syncing&&r){S.syncing=true;S.subChart.timeScale().setVisibleLogicalRange(r);S.syncing=false;}
+  });
+  S.subChart.timeScale().subscribeVisibleLogicalRangeChange(r=>{
+    if(!S.syncing&&r){S.syncing=true;S.chart.timeScale().setVisibleLogicalRange(r);S.syncing=false;}
+  });
+  new ResizeObserver(()=>{
+    S.chart.applyOptions({width:mEl.offsetWidth,height:mEl.offsetHeight});
+    S.subChart.applyOptions({width:sEl.offsetWidth,height:sEl.offsetHeight});
+  }).observe(mEl.parentElement);
+}
+
+// ── TF CACHE ─────────────────────────────────────────────────────
+// Key: `${sym}_${tf}`, Value: snapshot JSON — cleared when sym changes
+const _tfCache = {};
+let   _cacheSymKey = '';  // tracks which symbol the cache belongs to
+
+// ── LOAD ─────────────────────────────────────────────────────────
+async function loadSymbol(){
+  const sym=(document.getElementById('sym-in').value||'TSLA').trim().toUpperCase();
+  S.sym=sym; document.getElementById('sym-in').value=sym;
+
+  // Clear cache on symbol change
+  if(_cacheSymKey !== sym){ Object.keys(_tfCache).forEach(k=>delete _tfCache[k]); _cacheSymKey=sym; }
+
+  const cacheKey = `${sym}_${S.tf}`;
+  let d = _tfCache[cacheKey] || null;
+
+  if(!d){
+    showOv(true,`Loading ${sym} [${S.tf.toUpperCase()}]…`);
+    try{
+      // ── 1. Network: check server + fetch data ──────────────────────
+      if(!S.serverOk) await checkServer();
+      if(!S.serverOk){toast('⚠ '+window.i18n.t('srvOffline'));return;}
+      const r=await fetch(`${API}/api/snapshot?symbol=${sym}&tf=${S.tf}&limit=${getLimitForTF(S.tf)}`,
+        {signal:AbortSignal.timeout(30000)});
+      if(r.status===422){const e=await r.json().catch(()=>({}));throw new Error(`无效代码「${sym}」— ${e.detail||'not found'}`);}
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      d=await r.json();
+      _tfCache[cacheKey]=d;  // store in cache
+    }catch(e){
+      // Network/server error only
+      toast(e.message.includes('无效')?e.message:'⚠ '+window.i18n.t('srvOffline')+'\n('+e.message+')');
+      setSrv(false);S.serverOk=false;
+      showOv(false); return;
+    }
+  }
+
+  S.bars=d.bars||[];S.signals=d.signals||[];
+  // ── 2. Update server status IMMEDIATELY after data received ────
+  S.serverOk=true;
+  setSrv(true,`${sym} · ${S.bars.length} bars · ${S.signals.length} signals`);
+  _clearRetry();
+  // ── 3. Render (separate from network error handling) ────────────
+  try{
+    if(!S.candles){await new Promise(r=>setTimeout(r,200));initCharts();}
+    renderCandles(d);renderVolume();renderMarkers();
+    renderMini();updateTopbar();updateLeft();
+    scrollToLast120();
+    document.getElementById('ct-tag').textContent=`${sym} · ${S.tf.toUpperCase()}`;
+    showSignalBanner(S.signals, S.bars);
+    bindCrosshair();
+    document.querySelectorAll('.chip').forEach(c=>
+      c.classList.toggle('active', c.textContent.trim()===sym||c.textContent.trim()===sym.replace('-USD',''))
+    );
+  }catch(e){
+    console.warn('[render]',e.message);  // render errors don't reset server status
+  }finally{showOv(false);}
+}
+
+// ── RENDER ───────────────────────────────────────────────────────
+function renderCandles(d){
+  S.candles.setData((d.bars||[]).map(b=>({time:b.time,open:b.open,high:b.high,low:b.low,close:b.close})));
+}
+function renderVolume(){
+  if(!S.bars.length) return;
+  S.volHist.setData(S.bars.map(b=>({time:b.time,value:b.volume,
+    color:b.close>=b.open?'rgba(8,153,129,.55)':'rgba(242,54,69,.55)'})));
+  const N=10,ma=[];
+  for(let i=N-1;i<S.bars.length;i++){
+    const sum=S.bars.slice(i-N+1,i+1).reduce((a,b)=>a+b.volume,0);
+    ma.push({time:S.bars[i].time,value:sum/N});
+  }
+  S.volMA.setData(ma);
+}
+function renderMarkers(){
+  if(!S.candles) return;
+  const markers=(S.signals||[])
+    .filter(s=>{
+      if(['eB','eS'].includes(s.side)&&!S.showEB) return false;
+      if(['B','S'].includes(s.side)&&!S.showB) return false;
+      return true;
+    })
+    .map(s=>{
+      const bull=['B','eB'].includes(s.side),conf=s.side==='B'||s.side==='S';
+      return{time:s.time,position:bull?'belowBar':'aboveBar',
+        color:bull?YELLOW:PINK,shape:bull?'arrowUp':'arrowDown',
+        text:s.side,size:conf?2:1};
+    }).sort((a,b)=>a.time-b.time);
+  S.candles.setMarkers(markers);
+}
+
+// ── LEFT PANEL ───────────────────────────────────────────────────
+function updateLeft(){
+  const sigs=S.signals,bars=S.bars;
+  const recent=sigs.slice(-30);
+  const nB=recent.filter(s=>['B','eB'].includes(s.side)).length;
+  const nS=recent.filter(s=>['S','eS'].includes(s.side)).length;
+  const tot=nB+nS||1;
+  const pB=Math.round(nB/tot*100),pS=Math.round(nS/tot*100);
+  set('g-num',pB);set('s-bull',pB+'%');set('s-bear',pS+'%');
+  set('s-neut',Math.max(0,100-pB-pS)+'%');setGauge(pB);
+  const trades=[];let ob=null;
+  sigs.forEach(s=>{if(s.side==='B'&&!ob)ob=s;else if(s.side==='S'&&ob){trades.push(s.price-ob.price);ob=null;}});
+  const wr=trades.length?Math.round(trades.filter(p=>p>0).length/trades.length*100):null;
+  set('rc-w',wr!==null?`${wr}%  (${trades.length})`:'—');
+  const lastB=[...sigs].reverse().find(s=>s.side==='B');
+  if(lastB&&bars.length>14){
+    const atr=calcATR(bars,14),e=+lastB.price;
+    set('rc-e',`$${e.toFixed(2)}`);set('rc-s',`$${(e-atr*2).toFixed(2)}`);
+    set('rc-t1',`$${(e+atr*2).toFixed(2)}`);set('rc-t2',`$${(e+atr*4).toFixed(2)}`);
+    set('rc-c',`${Math.round((+lastB.strength||0)*100)}%`);
+  }
+}
+function renderMini(){
+  const body=document.getElementById('log-mini');
+  body.innerHTML='';
+  const sigs=[...S.signals].filter(s=>s.side==='B'||s.side==='S').reverse().slice(0,30);
+  if(!sigs.length){
+    body.innerHTML=`<div style="color:var(--t3);font-size:11px;padding:4px 0">${window.i18n.t('noSignals')}</div>`;
+    return;
+  }
+  sigs.forEach(s=>{
+    const bull=['B','eB'].includes(s.side);
+    const date=new Date(s.time*1000).toISOString().slice(0,10);
+    const el=document.createElement('div');el.className='log-item';
+    el.innerHTML=`<span class="sig-pill ${s.side}">${s.side}</span>`+
+      `<span class="log-date">${date}</span>`+
+      `<span class="log-price ${bull?'y':'p'}">$${(+s.price).toFixed(2)}</span>`;
+    body.appendChild(el);
+  });
+}
+function updateTopbar(){
+  if(S.bars.length<2) return;
+  const last=S.bars[S.bars.length-1],prev=S.bars[S.bars.length-2];
+  const chg=((last.close-prev.close)/prev.close*100).toFixed(2);
+  set('c-sym',S.sym);set('c-price',last.close.toFixed(2));
+  const el=document.getElementById('c-chg');
+  el.textContent=`${chg>=0?'+':''}${chg}%`;
+  el.className='price-c '+(chg>=0?'up':'dn');
+}
+
+// ── UTILS ────────────────────────────────────────────────────────
+function calcATR(bars,n=14){
+  if(!bars||bars.length<n+1) return 1;
+  const sl=bars.slice(-n-1);let s=0;
+  for(let i=1;i<sl.length;i++){
+    const b=sl[i],p=sl[i-1];
+    s+=Math.max(b.high-b.low,Math.abs(b.high-p.close),Math.abs(b.low-p.close));
+  }
+  return s/n;
+}
+function setGauge(score){
+  const arc=226.2*.75,filled=(score/100)*arc;
+  const el=document.getElementById('g-arc');
+  el.setAttribute('stroke-dasharray',`${filled} 226.2`);
+  el.setAttribute('stroke',score>=50?'#089981':'#f23645');
+}
+function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function showOv(s,t=''){document.getElementById('ov').classList.toggle('show',s);if(t)set('ov-txt',t);}
+function toast(msg,ok=false,dur=4000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show'+(ok?' ok':'');
+  setTimeout(()=>t.className='',dur);
+}
+
+// ── TF ───────────────────────────────────────────────────────────
+function bindTF(){
+  document.querySelectorAll('.tf-btn').forEach(b=>b.addEventListener('click',()=>{
+    setTF(b.dataset.tf);loadSymbol();
+  }));
+}
+function setTF(tf){
+  S.tf=tf;document.getElementById('tf-sel').value=tf;
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.toggle('on',b.dataset.tf===tf));
+}
+function toggleLayer(l){ /* EMA lines removed */ }
+function toggleSig(t){
+  if(t==='eB'){S.showEB=!S.showEB;tog('tog-eb',S.showEB);}
+  else{S.showB=!S.showB;tog('tog-b',S.showB);}
+  renderMarkers();
+}
+function tog(id,on){document.getElementById(id).className='tog'+(on?' on':'');}
+
+// ── PAYMENT MODAL ────────────────────────────────────────────────
+let _selPlan = 'monthly';
+let _ppSDKLoaded = false;
+
+function openSub(){ document.getElementById('sub-modal').style.display='flex'; }
+function closeSub(){ document.getElementById('sub-modal').style.display='none'; }
+
+function selPlan(el){
+  document.querySelectorAll('.mp').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel'); _selPlan=el.dataset.plan;
+  // Re-render PayPal button for new plan amount
+  if(_ppSDKLoaded) _renderPayPalBtn();
+}
+function planClick(el){
+  document.querySelectorAll('.plan-c').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel'); _selPlan=el.dataset.plan; openSub();
+}
+function setPayTab(name,btn){
+  document.querySelectorAll('.pay-tab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.pay-panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(`panel-${name}`).classList.add('on');
+  if(name==='paypal' && !_ppSDKLoaded) loadPayPalSDK();
+}
+
+// ── PayPal JS SDK ─────────────────────────────────────────────────
+async function loadPayPalSDK(){
+  const status = document.getElementById('paypal-status');
+  if(_ppSDKLoaded){ _renderPayPalBtn(); return; }
+  try{
+    const r = await fetch(`${API}/api/paypal/client-id`);
+    const d = await r.json();
+    if(!d.configured || !d.client_id){
+      if(status) status.textContent='PayPal not configured on server. Set PAYPAL_CLIENT_ID + PAYPAL_CLIENT_SECRET in .env';
+      return;
+    }
+    // Load PayPal SDK script
+    await new Promise((res,rej)=>{
+      if(document.getElementById('paypal-sdk')){ res(); return; }
+      const s=document.createElement('script');
+      s.id='paypal-sdk';
+      s.src=`https://www.paypal.com/sdk/js?client-id=${d.client_id}&currency=USD&intent=capture&components=buttons`;
+      s.onload=res; s.onerror=()=>rej(new Error('Failed to load PayPal SDK'));
+      document.head.appendChild(s);
+    });
+    _ppSDKLoaded=true;
+    _renderPayPalBtn();
+  }catch(e){
+    if(status) status.textContent='PayPal error: '+e.message;
+  }
+}
+
+function _renderPayPalBtn(){
+  const container = document.getElementById('paypal-btn-container');
+  if(!container || !window.paypal) return;
+  // Clear old button
+  container.innerHTML='';
+  paypal.Buttons({
+    style:{ layout:'vertical', color:'blue', shape:'rect', label:'pay', height:40 },
+    createOrder: async()=>{
+      const email=document.getElementById('sub-email').value.trim();
+      if(!email||!email.includes('@')) throw new Error('Please enter a valid email first');
+      const r=await fetch(`${API}/api/paypal/create-order`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email, plan:_selPlan}),
+      });
+      const d=await r.json();
+      if(d.detail||d.error) throw new Error(d.detail||d.error);
+      return d.order_id;
+    },
+    onApprove: async(data)=>{
+      const email=document.getElementById('sub-email').value.trim();
+      const ps=document.getElementById('paypal-status');
+      if(ps) ps.textContent='Capturing payment…';
+      const r=await fetch(`${API}/api/paypal/capture-order`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({order_id:data.orderID, email, plan:_selPlan}),
+      });
+      const d=await r.json();
+      if(d.success){
+        closeSub();
+        toast('🎉 Payment successful! Welcome to PRO.', true, 6000);
+        set('sub-tag','PRO'); set('user-plan-tag','PRO Plan');
+      } else {
+        toast('Capture failed: '+(d.detail||'unknown error'));
+      }
+    },
+    onCancel: ()=>toast('Payment cancelled.',false,3000),
+    onError: (err)=>toast('PayPal error: '+err),
+  }).render('#paypal-btn-container');
+}
+
+// ── USDT Manual Wallet ────────────────────────────────────────────
+async function showUSDTWallet(){
+  const email=document.getElementById('sub-email-usdt').value.trim();
+  if(!email||!email.includes('@')){ toast('Enter a valid email first'); return; }
+  try{
+    const r=await fetch(`${API}/api/usdt/wallet?plan=${_selPlan}&email=${encodeURIComponent(email)}`);
+    const d=await r.json();
+    if(d.detail) throw new Error(d.detail);
+    document.getElementById('usdt-addr').textContent = d.address;
+    document.getElementById('usdt-amount-display').textContent = d.amount;
+    // QR code via free public API (loaded by user's browser, not server)
+    document.getElementById('usdt-qr').src =
+      `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(d.address)}`;
+    document.getElementById('usdt-result').style.display='block';
+  }catch(e){ toast('USDT: '+e.message); }
+}
+
+function copyUSDTAddr(){
+  const addr=document.getElementById('usdt-addr').textContent;
+  navigator.clipboard?.writeText(addr).then(()=>toast('Address copied!',true,2000));
+}
+
+async function submitUSDTTx(){
+  const email=document.getElementById('sub-email-usdt').value.trim();
+  const txHash=document.getElementById('usdt-tx-input').value.trim();
+  const statusEl=document.getElementById('usdt-submit-status');
+  if(!txHash){ toast('Paste your TX hash first'); return; }
+  try{
+    const r=await fetch(`${API}/api/usdt/submit`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email, plan:_selPlan, tx_hash:txHash}),
+    });
+    const d=await r.json();
+    if(statusEl) statusEl.textContent = '✅ '+d.message;
+    toast('TX submitted! We\'ll email you upon activation.', true, 5000);
+  }catch(e){ toast('Submit error: '+e.message); }
+}
+
+// ── Stripe Card Checkout ──────────────────────────────────────────
+async function startStripeCheckout(){
+  const email=document.getElementById('sub-email-card').value.trim();
+  if(!email||!email.includes('@')){ toast('Enter a valid email first'); return; }
+  const statusEl=document.getElementById('card-status');
+  if(statusEl) statusEl.textContent='Redirecting to Stripe…';
+  try{
+    const r=await fetch(`${API}/api/subscribe/create-checkout`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email, plan:_selPlan}),
+    });
+    const d=await r.json();
+    if(d.detail||d.error) throw new Error(d.detail||d.error);
+    if(d.url) window.location.href=d.url;
+    else throw new Error('No checkout URL returned');
+  }catch(e){
+    if(statusEl) statusEl.textContent='';
+    toast('Stripe: '+e.message);
+  }
+}
+
+// ── Alipay / WeChat Pay (via Stripe) ─────────────────────────────
+async function startAlipayCheckout(method){
+  const email=document.getElementById('sub-email-alipay').value.trim();
+  if(!email||!email.includes('@')){ toast('Enter a valid email first'); return; }
+  const statusEl=document.getElementById('alipay-status');
+  const label = method==='alipay'?'Alipay':'WeChat Pay';
+  if(statusEl) statusEl.textContent=`Redirecting to ${label}…`;
+  try{
+    const r=await fetch(`${API}/api/subscribe/alipay-checkout`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email, plan:_selPlan, method}),
+    });
+    const d=await r.json();
+    if(d.detail||d.error) throw new Error(d.detail||d.error);
+    if(d.url) window.location.href=d.url;
+    else throw new Error('No checkout URL returned');
+  }catch(e){
+    if(statusEl) statusEl.textContent='';
+    toast(label+': '+e.message);
+  }
+}
+
+// ── Status check / Return URL handling ───────────────────────────
+async function checkMyStatus(){
+  const email=prompt('Enter your email:');
+  if(!email) return;
+  try{
+    const r=await fetch(`${API}/api/user/status?email=${encodeURIComponent(email)}`);
+    const d=await r.json();
+    set('sub-note', d.active?`✓ Active · ${d.plan} · expires ${d.expires?.slice(0,10)}`:'No active subscription found.');
+    set('sub-tag', d.active?'PRO':'FREE');
+  }catch{ set('sub-note','Error checking status.'); }
+}
+
+function checkReturnFromStripe(){
+  const p=new URLSearchParams(location.search);
+  // Stripe card return
+  if(p.get('stripe')==='success'){
+    toast('🎉 Payment successful! Welcome to PRO.', true, 6000);
+    set('sub-tag','PRO'); set('user-plan-tag','PRO Plan');
+  }
+  if(p.get('stripe')==='canceled') toast('Payment cancelled.',false,3000);
+  // PayPal redirect return (fallback for browsers that block popup)
+  if(p.get('paypal')==='success'){
+    const orderId=p.get('token')||p.get('order_id')||'';
+    const email=p.get('email')||'';
+    const plan=p.get('plan')||_selPlan;
+    if(orderId && email){
+      fetch(`${API}/api/paypal/capture-order`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({order_id:orderId, email, plan}),
+      }).then(r=>r.json()).then(d=>{
+        if(d.success) toast('🎉 PayPal payment confirmed! Welcome to PRO.', true, 6000);
+        else toast('PayPal capture issue — contact support with order ID: '+orderId);
+      });
+    }
+    set('sub-tag','PRO');
+  }
+  if(p.get('paypal')==='canceled') toast('PayPal payment cancelled.',false,3000);
+  // Clean URL
+  if(p.get('stripe')||p.get('paypal'))
+    history.replaceState({},'',location.pathname);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEATURE 1: LIGHT / DARK THEME TOGGLE  (Unusual Whales inspired)
+// ═══════════════════════════════════════════════════════════════
+let _darkMode = localStorage.getItem('iai_theme') !== 'light';
+
+function applyTheme(){
+  document.body.classList.toggle('light', !_darkMode);
+  document.getElementById('theme-btn').textContent = _darkMode ? '🌙' : '☀️';
+  // Update chart backgrounds
+  const bg   = _darkMode ? '#131722' : '#f0f3fa';
+  const text = _darkMode ? '#787b86' : '#5d6378';
+  const grid = _darkMode ? 'rgba(42,46,57,.6)' : 'rgba(180,190,210,.5)';
+  [S.chart, S.subChart].forEach(c => {
+    if (!c) return;
+    c.applyOptions({
+      layout: { background: { color: 'transparent' }, textColor: text },
+      grid: { vertLines: { color: grid }, horzLines: { color: grid } },
+    });
+  });
+}
+function toggleTheme(){
+  _darkMode = !_darkMode;
+  localStorage.setItem('iai_theme', _darkMode ? 'dark' : 'light');
+  applyTheme();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEATURE 2: SIGNAL ALERT BANNER  (TrendSpider inspired)
+// ═══════════════════════════════════════════════════════════════
+function showSignalBanner(signals, bars){
+  const banner = document.getElementById('sig-banner');
+  if (!signals.length || !bars.length) { banner.className = ''; return; }
+  // Find most recent signal — show if within last 5 bars
+  const lastSig  = signals[signals.length - 1];
+  const lastBar  = bars[bars.length - 1];
+  const barsAgo  = bars.filter(b => b.time >= lastSig.time).length - 1;
+  if (barsAgo > 5) { banner.className = ''; return; }
+  const bull  = ['B','eB'].includes(lastSig.side);
+  const label = { B:'✅ Confirmed Buy', eB:'⚡ Early Buy', S:'🔴 Confirmed Sell', eS:'⚠️ Early Sell' }[lastSig.side] || lastSig.side;
+  const date  = new Date(lastSig.time * 1000).toISOString().slice(0, 10);
+  document.getElementById('sig-banner-txt').textContent =
+    `${label} · ${S.sym} · $${(+lastSig.price).toFixed(2)} · ${date} · ${barsAgo === 0 ? 'Latest bar' : barsAgo + ' bars ago'}`;
+  banner.className = 'show ' + (bull ? 'bull' : 'bear');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEATURE 3: OHLCV CROSSHAIR ROW — extended + volume sync
+// ═══════════════════════════════════════════════════════════════
+let _lastCrosshairPrice = null;
+let _lastCrosshairTime  = null;
+let _crosshairHandler   = null;
+
+function bindCrosshair(){
+  if (!S.chart || !S.candles) return;
+  // Unsubscribe previous handler to avoid stacking listeners on TF switch
+  if (_crosshairHandler) { try{ S.chart.unsubscribeCrosshairMove(_crosshairHandler); }catch{} }
+
+  _crosshairHandler = param => {
+    const row = document.getElementById('ohlcv-row');
+    const volInfo = document.getElementById('vol-crosshair-info');
+
+    if (!param || !param.time || !param.seriesData) {
+      row.classList.remove('show');
+      if (volInfo) volInfo.textContent = '';
+      try { S.subChart && S.subChart.clearCrosshairPosition && S.subChart.clearCrosshairPosition(); } catch{}
+      return;
+    }
+    const bar = param.seriesData.get(S.candles);
+    if (!bar) { row.classList.remove('show'); return; }
+
+    row.classList.add('show');
+    _lastCrosshairPrice = bar.close;
+    _lastCrosshairTime  = param.time;
+
+    // Formatters
+    const fmt = v => (+v).toFixed(2);
+    const fmtVol = v => {
+      if (!v) return '—';
+      if (v >= 1e8) return (v/1e6).toFixed(0)+'M';
+      if (v >= 1e6) return (v/1e6).toFixed(2)+'M';
+      if (v >= 1e3) return (v/1e3).toFixed(0)+'K';
+      return String(v);
+    };
+    const fmtAmt = v => {
+      if (!v) return '—';
+      if (v >= 1e9)  return '$'+(v/1e9).toFixed(2)+'B';
+      if (v >= 1e6)  return '$'+(v/1e6).toFixed(1)+'M';
+      if (v >= 1e3)  return '$'+(v/1e3).toFixed(0)+'K';
+      return '$'+v.toFixed(0);
+    };
+
+    // OHLC
+    document.getElementById('ov-o').textContent = fmt(bar.open);
+    document.getElementById('ov-h').textContent = fmt(bar.high);
+    document.getElementById('ov-l').textContent = fmt(bar.low);
+    document.getElementById('ov-c').textContent = fmt(bar.close);
+
+    // Full bar data from S.bars (includes volume)
+    const t = param.time;
+    const barIdx = S.bars.findIndex(b => b.time === t);
+    const fullBar = barIdx >= 0 ? S.bars[barIdx] : null;
+    const prevBar = barIdx > 0  ? S.bars[barIdx - 1] : null;
+
+    // 涨跌幅
+    const chgAmtEl = document.getElementById('ov-chgamt');
+    const chgPctEl = document.getElementById('ov-chgpct');
+    if (prevBar) {
+      const chgAmt = bar.close - prevBar.close;
+      const chgPct = chgAmt / prevBar.close * 100;
+      const up = chgAmt >= 0;
+      const color = up ? 'var(--bull)' : 'var(--bear)';
+      chgAmtEl.textContent = (up?'+':'')+chgAmt.toFixed(2);
+      chgAmtEl.style.color = color;
+      chgPctEl.textContent = (up?'+':'')+chgPct.toFixed(2)+'%';
+      chgPctEl.style.color = color;
+    } else {
+      chgAmtEl.textContent = '—'; chgPctEl.textContent = '—';
+    }
+
+    // 成交量 + 量比 + 成交额
+    if (fullBar) {
+      const vol = fullBar.volume || 0;
+      // 10-day avg vol
+      const sliceStart = Math.max(0, barIdx - 10);
+      const vSlice = S.bars.slice(sliceStart, barIdx);
+      const avgVol = vSlice.length ? vSlice.reduce((a,b)=>a+(b.volume||0),0)/vSlice.length : 0;
+      const vratio = avgVol > 0 ? vol/avgVol : 0;
+
+      document.getElementById('ov-v').textContent = fmtVol(vol);
+      document.getElementById('ov-amount').textContent = fmtAmt(bar.close * vol);
+      const vEl = document.getElementById('ov-vratio');
+      vEl.textContent = vratio ? vratio.toFixed(2)+'x' : '—';
+      vEl.style.color = vratio >= 1.73 ? 'var(--yellow)' : vratio > 0 ? 'var(--text)' : 'var(--t2)';
+
+      // Volume sub-chart label
+      if (volInfo) volInfo.textContent =
+        `│ Vol: ${fmtVol(vol)}  Avg: ${fmtVol(Math.round(avgVol))}  Ratio: ${vratio?vratio.toFixed(2)+'x':'—'}`;
+
+      // Sync crosshair to sub-chart
+      try {
+        if (S.subChart && S.volHist && S.subChart.setCrosshairPosition) {
+          S.subChart.setCrosshairPosition(vol, t, S.volHist);
+        }
+      } catch{}
+    } else {
+      ['ov-v','ov-amount','ov-vratio'].forEach(id=>set(id,'—'));
+      if (volInfo) volInfo.textContent = '';
+    }
+
+    // Signal badge
+    const sig   = S.signals.find(s => s.time === t);
+    const sigEl = document.getElementById('ov-sig');
+    if (sig) {
+      sigEl.style.display = 'inline';
+      sigEl.textContent   = sig.side;
+      sigEl.className     = 'ohlcv-sig ' + sig.side;
+    } else {
+      sigEl.style.display = 'none';
+    }
+  };
+  S.chart.subscribeCrosshairMove(_crosshairHandler);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEATURE 4: QUICK SYMBOL CHIPS  (Koyfin inspired)
+// ═══════════════════════════════════════════════════════════════
+function quickLoad(sym){
+  document.getElementById('sym-in').value = sym;
+  // Highlight active chip
+  document.querySelectorAll('.chip').forEach(c =>
+    c.classList.toggle('active', c.textContent.trim() === sym || c.textContent.trim() === sym.replace('-USD',''))
+  );
+  loadSymbol();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEATURE 5: WATCHLIST  (TrendSpider Smart Watchlist inspired)
+// ═══════════════════════════════════════════════════════════════
+let _watchlist = JSON.parse(localStorage.getItem('iai_watchlist') || '["AAPL","NVDA","SPY","QQQ"]');
+let _wlData    = {}; // sym -> { price, chg, sig }
+
+function saveWL(){ localStorage.setItem('iai_watchlist', JSON.stringify(_watchlist)); }
+
+function renderWatchlist(){
+  const body = document.getElementById('wl-list');
+  const cnt  = document.getElementById('wl-count');
+  if (!_watchlist.length){
+    body.innerHTML = '<div class="wl-empty">Add symbols to track signals</div>';
+    cnt.textContent = '↻';
+    return;
+  }
+  cnt.textContent = _watchlist.length + ' ↻';
+  body.innerHTML = _watchlist.map(sym => {
+    const d   = _wlData[sym] || {};
+    const chg = d.chg != null ? (d.chg >= 0 ? '+' : '') + d.chg.toFixed(2) + '%' : '…';
+    const cls = d.chg != null ? (d.chg >= 0 ? 'up' : 'dn') : '';
+    const sig = d.sig || '—';
+    const sigCls = ['B','eB','S','eS'].includes(sig) ? sig : 'none';
+    const price = d.price != null ? '$' + d.price.toFixed(2) : '…';
+    return `<div class="wl-row" onclick="quickLoad('${sym}');updateWLActive('${sym}')">
+      <span class="wl-sym">${sym}</span>
+      <span class="wl-price">${price}</span>
+      <span class="wl-chg ${cls}">${chg}</span>
+      <span class="wl-sig ${sigCls}">${sig}</span>
+      <span style="color:var(--t3);font-size:11px;cursor:pointer;margin-left:6px"
+        onclick="event.stopPropagation();removeFromWL('${sym}')">✕</span>
+    </div>`;
+  }).join('');
+}
+
+function updateWLActive(sym){
+  document.querySelectorAll('.wl-row .wl-sym').forEach(el =>
+    el.parentElement.style.background = el.textContent === sym ? 'rgba(41,98,255,.07)' : ''
+  );
+}
+
+async function fetchWLItem(sym){
+  try {
+    const r = await fetch(`${API}/api/snapshot?symbol=${sym}&tf=1d&limit=10`,
+      { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) return;
+    const d = await r.json();
+    const bars = d.bars || [];
+    if (bars.length < 2) return;
+    const last = bars[bars.length-1], prev = bars[bars.length-2];
+    const chg  = (last.close - prev.close) / prev.close * 100;
+    const sigs = d.signals || [];
+    const lastSig = sigs.length ? sigs[sigs.length-1] : null;
+    const barsAgo = lastSig ? bars.filter(b => b.time >= lastSig.time).length - 1 : 99;
+    _wlData[sym] = {
+      price: last.close,
+      chg,
+      sig: (lastSig && barsAgo <= 3) ? lastSig.side : null,
+    };
+  } catch { /* silent */ }
+}
+
+async function refreshWatchlist(){
+  document.getElementById('wl-count').textContent = '⟳';
+  await Promise.all(_watchlist.map(sym => fetchWLItem(sym)));
+  renderWatchlist();
+}
+
+function addToWatchlist(){
+  const sym = (document.getElementById('wl-in').value || '').trim().toUpperCase();
+  if (!sym) return;
+  if (!_watchlist.includes(sym)) {
+    _watchlist.push(sym);
+    saveWL();
+    fetchWLItem(sym).then(renderWatchlist);
+  }
+  document.getElementById('wl-in').value = '';
+}
+
+function removeFromWL(sym){
+  _watchlist = _watchlist.filter(s => s !== sym);
+  delete _wlData[sym];
+  saveWL();
+  renderWatchlist();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEATURE 6: MOBILE NAV  (responsive panel switching)
+// ═══════════════════════════════════════════════════════════════
+function mobPanel(p){
+  const isMob = window.innerWidth <= 768;
+  if (!isMob) return;
+  const l = document.querySelector('.panel-l');
+  const r = document.querySelector('.panel-r');
+  const c = document.getElementById('chart-col');
+  [l, r, c].forEach(el => el && (el.style.display = 'none'));
+  document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('active'));
+  if (p === 'chart') { c.style.display = 'flex'; }
+  else if (p === 'left')  { l.style.display = 'flex'; }
+  else if (p === 'right') { r.style.display = 'flex'; }
+  const idx = ['chart','left','right'].indexOf(p);
+  document.querySelectorAll('.mob-nav-btn')[idx]?.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCROLL TO LAST N BARS (default 120)
+// ═══════════════════════════════════════════════════════════════
+function scrollToLast120(){
+  if (!S.bars || !S.bars.length){ S.chart.timeScale().fitContent(); return; }
+  const prefs = loadPrefs();
+  const n = Math.min(prefs.bars || 120, S.bars.length);
+  try {
+    S.chart.timeScale().setVisibleRange({
+      from: S.bars[S.bars.length - n].time,
+      to:   S.bars[S.bars.length - 1].time,
+    });
+  } catch { S.chart.timeScale().fitContent(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRAWING TOOLS
+// ═══════════════════════════════════════════════════════════════
+let _drawMode   = 'cursor';
+let _magnetMode = false;
+let _drawnLines = [];   // [{series, priceLine}]
+
+function setDrawMode(mode){
+  _drawMode = mode;
+  document.querySelectorAll('.draw-btn[data-mode]').forEach(b =>
+    b.classList.toggle('on', b.dataset.mode === mode)
+  );
+  document.getElementById('main-chart').style.cursor =
+    mode === 'cursor' ? '' : 'crosshair';
+  if (mode !== 'cursor')
+    toast({ hline:'水平线模式 · 点击图表放置', tline:'趋势线即将推出', rect:'矩形即将推出' }[mode] || mode, mode==='hline', 2000);
+}
+
+function toggleMagnet(){
+  _magnetMode = !_magnetMode;
+  document.getElementById('draw-magnet').classList.toggle('on', _magnetMode);
+  toast(_magnetMode ? '磁吸模式 ON' : '磁吸模式 OFF', _magnetMode, 1500);
+}
+
+function undoLastDrawing(){
+  if (!_drawnLines.length){ toast('没有可撤销的绘图'); return; }
+  const last = _drawnLines.pop();
+  try { last.series.removePriceLine(last.priceLine); } catch{}
+}
+
+function clearDrawings(){
+  _drawnLines.forEach(d => { try { d.series.removePriceLine(d.priceLine); } catch{} });
+  _drawnLines = [];
+  toast('已清除所有绘图', true, 1500);
+}
+
+function bindDrawingClick(){
+  document.getElementById('main-chart').addEventListener('click', () => {
+    if (_drawMode === 'cursor' || _lastCrosshairPrice == null) return;
+    if (_drawMode === 'hline'){
+      const price = _magnetMode
+        ? (S.bars.find(b => b.time === _lastCrosshairTime)?.close ?? _lastCrosshairPrice)
+        : _lastCrosshairPrice;
+      const pl = S.candles.createPriceLine({
+        price,
+        color: 'rgba(245,197,24,.85)',
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Dashed,
+        axisLabelVisible: true,
+        title: '$'+price.toFixed(2),
+      });
+      _drawnLines.push({ series: S.candles, priceLine: pl });
+      return;
+    }
+    toast({ tline:'趋势线即将推出 · Coming soon', rect:'矩形即将推出 · Coming soon' }[_drawMode] || '', false, 2000);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// USER PANEL & PREFERENCES
+// ═══════════════════════════════════════════════════════════════
+function loadPrefs(){
+  try { return JSON.parse(localStorage.getItem('iai_prefs') || '{}'); } catch { return {}; }
+}
+
+function toggleUserPanel(){
+  const dd = document.getElementById('user-dd');
+  dd.classList.toggle('open');
+  if (dd.classList.contains('open')) _syncPrefsUI();
+}
+function closeUserPanel(){
+  document.getElementById('user-dd').classList.remove('open');
+}
+
+function _syncPrefsUI(){
+  const p = loadPrefs();
+  const sym = p.sym || document.getElementById('sym-in').value || 'TSLA';
+  document.getElementById('pref-sym').value  = sym;
+  document.getElementById('pref-tf').value   = p.tf || S.tf || '1d';
+  document.getElementById('pref-bars').value = p.bars || 120;
+  document.getElementById('pref-banner').checked  = p.banner !== false;
+  document.getElementById('pref-autoload').checked = p.autoload !== false;
+}
+
+function savePrefs(){
+  const prefs = {
+    sym:      (document.getElementById('pref-sym').value||'TSLA').trim().toUpperCase(),
+    tf:       document.getElementById('pref-tf').value,
+    bars:     Math.max(30, Math.min(500, parseInt(document.getElementById('pref-bars').value)||120)),
+    banner:   document.getElementById('pref-banner').checked,
+    autoload: document.getElementById('pref-autoload').checked,
+  };
+  localStorage.setItem('iai_prefs', JSON.stringify(prefs));
+  // EMA lines fully removed
+  closeUserPanel();
+  toast('设置已保存 · Saved', true, 2000);
+}
+
+// ── EXPORT ───────────────────────────────────────────────────────
+function copyLink(){
+  navigator.clipboard?.writeText(`${location.origin}${location.pathname}?symbol=${S.sym}&tf=${S.tf}`)
+    .then(()=>toast(window.i18n.t('copyLink')+' ✓',true,2000));
+}
+function exportCSV(){
+  if(!S.signals.length){toast('No signals to export');return;}
+  const rows=['date,symbol,tf,side,price,strength,reason'];
+  S.signals.forEach(s=>{
+    const date=new Date(s.time*1000).toISOString().slice(0,10);
+    rows.push(`${date},${S.sym},${S.tf},${s.side},${s.price},${s.strength},${s.reason}`);
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));
+  a.download=`${S.sym}_${S.tf}_signals.csv`;a.click();
+}
+</script>
+</body>
+</html>

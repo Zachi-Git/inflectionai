@@ -1,0 +1,9 @@
+# InflectionAI Backend Dependencies
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+yfinance>=0.2.36
+pandas>=2.0.0
+numpy>=1.24.0
+stripe>=7.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0

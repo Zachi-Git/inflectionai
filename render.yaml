@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: inflectionai-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: FRONTEND_URL
+        sync: false          # set this in Render dashboard
+      - key: STRIPE_SECRET_KEY
+        sync: false          # set this in Render dashboard
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false          # set this in Render dashboard
+      - key: STRIPE_PRICE_WEEKLY
+        sync: false
+      - key: STRIPE_PRICE_MONTHLY
+        sync: false
+      - key: STRIPE_PRICE_QUARTERLY
+        sync: false
+      - key: STRIPE_PRICE_YEARLY
+        sync: false
+      - key: ADMIN_KEY
+        generateValue: true  # auto-generated
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/website
+      sizeGB: 1              # stores SQLite DB

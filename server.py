@@ -36,12 +36,32 @@ Run locally:
   python server.py
 """
 
-import os, sys, json, sqlite3, secrets, hashlib, time, hmac
+import os, sys, json, sqlite3, secrets, hashlib, time, hmac, threading
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from pathlib import Path
 from contextlib import contextmanager
 import urllib.request, urllib.parse
+
+# ── In-memory data cache (TTL-based, zero extra dependencies) ────
+_CACHE: dict = {}
+_CACHE_LOCK = threading.Lock()
+# TTL seconds per timeframe — daily data valid 6 h, hourly 1 h
+_CACHE_TTL = {"1h": 3600, "4h": 7200, "1d": 21600, "1w": 43200, "1M": 86400}
+
+def _ck(sym, tf, limit):          return f"{sym}|{tf}|{limit}"
+def _cache_get(key, tf):
+    with _CACHE_LOCK:
+        e = _CACHE.get(key)
+        if e and time.time() - e["ts"] < _CACHE_TTL.get(tf, 3600):
+            return e["payload"]
+    return None
+def _cache_set(key, payload):
+    with _CACHE_LOCK:
+        _CACHE[key] = {"payload": payload, "ts": time.time()}
+
+# Symbols pre-warmed at startup (most commonly searched)
+_WARMUP = ["AAPL","TSLA","NVDA","SPY","MSFT","AMZN","META","GOOGL"]
 
 # ── FastAPI ──────────────────────────────────────────────────────
 from fastapi import FastAPI, Query, HTTPException, Request, Header, Depends
@@ -255,6 +275,65 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def _build_snapshot_payload(sym, tf, limit, fast=8, slow=20, aux=50, confirm=2):
+    """Fetch data + compute signals → return the full response dict (cacheable)."""
+    prov = YFinanceProvider()
+    df   = prov.get_ohlcv(sym, tf, limit=limit)
+    strat = EMACrossoverStrategy(fast=fast, slow=slow, confirm_window=confirm)
+    sigs  = strat.generate_signals(df)
+
+    def to_unix(ts):
+        try:    return int(ts.timestamp())
+        except: return int(ts.value // 1_000_000_000)
+
+    def ema_s(period):
+        s = df["close"].ewm(span=period, adjust=False).mean()
+        return [{"time": to_unix(t), "value": round(float(v), 6)} for t, v in s.items()]
+
+    return {
+        "bars": [
+            {"time": to_unix(t), "open": round(float(r.open),6),
+             "high": round(float(r.high),6), "low": round(float(r.low),6),
+             "close": round(float(r.close),6), "volume": int(r.volume)}
+            for t, r in df.iterrows()
+        ],
+        "signals": [
+            {"time": to_unix(s.time),
+             "side": s.side if isinstance(s.side, str) else s.side.value,
+             "price": round(float(s.price), 6),
+             "reason": getattr(s, "reason", ""),
+             "regime": getattr(s, "regime", ""),
+             "strength": round(float(getattr(s, "strength", 0.9)), 4)}
+            for s in sigs
+        ],
+        "ema_series": ema_s(slow),
+        "aux_series": ema_s(aux),
+        "meta": {
+            "symbol": sym, "tf": tf,
+            "signal_fast": fast, "signal_slow": slow,
+            "ema_period": slow, "aux_period": aux,
+            "engine": _ENGINE,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "cached": False,
+        },
+    }
+
+
+def _warmup():
+    """Pre-load popular symbols into cache in background (non-blocking)."""
+    time.sleep(3)  # wait for server to fully start
+    for sym in _WARMUP:
+        try:
+            key = _ck(sym, "1d", 600)
+            if _cache_get(key, "1d") is None:
+                payload = _build_snapshot_payload(sym, "1d", 600)
+                payload["meta"]["cached"] = True
+                _cache_set(key, payload)
+                print(f"  [warmup] ✓ {sym}")
+        except Exception as ex:
+            print(f"  [warmup] ✗ {sym}: {ex}")
+
+
 @app.on_event("startup")
 def startup():
     init_db()
@@ -265,6 +344,8 @@ def startup():
     print(f"  PayPal:      {'✓' if _paypal_ok else '✗ (set PAYPAL_CLIENT_ID + PAYPAL_CLIENT_SECRET)'}")
     print(f"  USDT wallet: {'✓' if _usdt_ok else '✗ (set USDT_WALLET_ADDRESS)'}")
     print(f"  Engine: {_ENGINE}")
+    # Pre-warm cache in background so first users get instant responses
+    threading.Thread(target=_warmup, daemon=True).start()
 
 
 # ── Auth dependency ──────────────────────────────────────────────
@@ -305,11 +386,15 @@ def get_stripe_price(plan: str) -> str:
 # ═══════════════════════════════════════════════════════════════
 
 @app.get("/api/health")
+@app.get("/health")   # short alias for keep-alive pings
 def health():
+    with _CACHE_LOCK:
+        cache_size = len(_CACHE)
     return {
         "status": "ok",
         "engine": _ENGINE,
         "stripe": STRIPE_OK,
+        "cache_entries": cache_size,
         "ts": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -318,79 +403,43 @@ def plans():
     return {"plans": PLANS}
 
 
-# ── Signal snapshot (PUBLIC — free preview, last 50 bars of signals) ─────────
+# ── Signal snapshot — with TTL cache (daily=6h, hourly=1h) ───────
 @app.get("/api/snapshot")
 def snapshot(
-    symbol:  str = Query("TSLA"),
-    tf:      str = Query("1d"),
-    limit:   int = Query(600),
-    fast:    int = Query(8),    # signal fast EMA — EMA(8) crosses EMA(20)
-    slow:    int = Query(20),   # signal slow EMA — also the primary chart line
-    aux:     int = Query(50),   # auxiliary chart display line (EMA50), NOT used for signals
-    confirm: int = Query(2),
-    preview: bool = Query(False),   # True = free preview (50 bars only)
+    symbol:  str  = Query("TSLA"),
+    tf:      str  = Query("1d"),
+    limit:   int  = Query(600),
+    fast:    int  = Query(8),
+    slow:    int  = Query(20),
+    aux:     int  = Query(50),
+    confirm: int  = Query(2),
+    preview: bool = Query(False),
     x_api_key: Optional[str] = Header(None),
 ):
     sym = symbol.strip().upper()
 
-    # Auth check: authenticated + subscribed users get full data
-    full_access = False
-    if x_api_key:
-        email = verify_api_key(x_api_key)
-        if email and get_sub_status(email)["active"]:
-            full_access = True
+    # Only cache standard params to keep cache simple
+    use_cache = (fast == 8 and slow == 20 and aux == 50 and confirm == 2)
+    key = _ck(sym, tf, limit)
 
-    bar_limit = limit  # TODO: re-enable tiering after launch
+    if use_cache:
+        cached = _cache_get(key, tf)
+        if cached is not None:
+            return cached          # ← instant return, zero yfinance calls
 
     try:
-        prov = YFinanceProvider()
-        df   = prov.get_ohlcv(sym, tf, limit=bar_limit)
+        payload = _build_snapshot_payload(sym, tf, limit, fast, slow, aux, confirm)
     except Exception as e:
         raise HTTPException(422, f"Data error: {e}")
 
-    strat = EMACrossoverStrategy(fast=fast, slow=slow, confirm_window=confirm)
-    sigs  = strat.generate_signals(df)
+    payload["meta"]["bars_count"]    = len(payload["bars"])
+    payload["meta"]["signals_count"] = len(payload["signals"])
+    payload["meta"]["cached"]        = False
 
-    def to_unix(ts):
-        try:    return int(ts.timestamp())
-        except: return int(ts.value // 1_000_000_000)
+    if use_cache:
+        _cache_set(key, payload)
 
-    def ema_series(period):
-        s = df["close"].ewm(span=period, adjust=False).mean()
-        return [{"time": to_unix(t), "value": round(float(v), 6)}
-                for t, v in s.items()]
-
-    bars_list = [
-        {"time": to_unix(t), "open": round(float(r.open),6),
-         "high": round(float(r.high),6), "low": round(float(r.low),6),
-         "close": round(float(r.close),6), "volume": int(r.volume)}
-        for t, r in df.iterrows()
-    ]
-    sigs_list = [
-        {"time": to_unix(s.time),
-         "side": s.side if isinstance(s.side, str) else s.side.value,
-         "price": round(float(s.price), 6),
-         "reason": getattr(s, "reason", ""),
-         "regime": getattr(s, "regime", ""),
-         "strength": round(float(getattr(s, "strength", 0.9)), 4)}
-        for s in sigs
-    ]
-
-    return {
-        "bars":       bars_list,
-        "signals":    sigs_list,
-        "ema_series": ema_series(slow),   # EMA(20) — primary chart display line
-        "aux_series": ema_series(aux),    # EMA(50) — auxiliary chart display line
-        "meta": {
-            "symbol": sym, "tf": tf,
-            "signal_fast": fast, "signal_slow": slow,   # EMA(8)×EMA(20) = signal pair
-            "ema_period": slow, "aux_period": aux,       # EMA(20)/EMA(50) = chart display
-            "bars_count": len(bars_list), "signals_count": len(sigs_list),
-            "full_access": full_access,
-            "engine": _ENGINE,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-        },
-    }
+    return payload
 
 
 # ═══════════════════════════════════════════════════════════════

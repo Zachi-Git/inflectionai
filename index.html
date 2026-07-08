@@ -1262,10 +1262,13 @@ function renderVolume(){
 }
 function renderMarkers(){
   if(!S.candles) return;
+  let _lastDir=null;
   const markers=(S.signals||[])
     .filter(s=>{
-      if(['eB','eS'].includes(s.side)&&!S.showEB) return false;
-      if(['B','S'].includes(s.side)&&!S.showB) return false;
+      if(s.side==='eB'){if(!S.showEB||_lastDir==='UP')return false;_lastDir='UP';return true;}
+      if(s.side==='eS'){if(!S.showEB||_lastDir==='DOWN')return false;_lastDir='DOWN';return true;}
+      if(s.side==='B'){if(!S.showB)return false;_lastDir='UP';return true;}
+      if(s.side==='S'){if(!S.showB)return false;_lastDir='DOWN';return true;}
       return true;
     })
     .map(s=>{

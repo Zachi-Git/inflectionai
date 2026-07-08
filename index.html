@@ -648,7 +648,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
     <!-- User Button -->
     <div class="user-wrap" id="user-wrap">
-      <button class="user-btn" onclick="toggleUserPanel()" id="user-btn" title="用户设置 · Settings">
+      <button class="user-btn" onclick="toggleUserPanel()" id="user-btn" title="Settings">
         <svg viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="8" r="4"/>
           <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
@@ -664,7 +664,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           </div>
         </div>
         <div class="user-dd-sep"></div>
-        <div class="user-dd-section">偏好设置 · Preferences</div>
+        <div class="user-dd-section" data-i18n="preferences">Preferences</div>
         <div class="user-pref-row">
           <label>Default Symbol</label>
           <input type="text" id="pref-sym" value="TSLA" style="width:72px">
@@ -790,11 +790,11 @@ body.light #main-chart,body.light #sub-chart{filter:none}
       <div class="ohlcv-item">L <span id="ov-l">—</span></div>
       <div class="ohlcv-item">C <span id="ov-c">—</span></div>
       <div class="ohlcv-sep"></div>
-      <div class="ohlcv-item">涨跌 <span id="ov-chgamt">—</span></div>
+      <div class="ohlcv-item"><span data-i18n="chgLabel">Chg</span> <span id="ov-chgamt">—</span></div>
       <div class="ohlcv-item"><span id="ov-chgpct">—</span></div>
       <div class="ohlcv-sep"></div>
-      <div class="ohlcv-item">成交额 <span id="ov-amount">—</span></div>
-      <div class="ohlcv-item">量比 <span id="ov-vratio">—</span></div>
+      <div class="ohlcv-item"><span data-i18n="turnoverLabel">Turnover</span> <span id="ov-amount">—</span></div>
+      <div class="ohlcv-item"><span data-i18n="volRatioLabel">Vol Ratio</span> <span id="ov-vratio">—</span></div>
       <div class="ohlcv-item">Vol <span id="ov-v">—</span></div>
       <span class="ohlcv-sig" id="ov-sig" style="display:none"></span>
     </div>
@@ -1211,13 +1211,13 @@ async function loadSymbol(){
       if(!S.serverOk){toast('⚠ '+window.i18n.t('srvOffline'));return;}
       const r=await fetch(`${API}/api/snapshot?symbol=${sym}&tf=${S.tf}&limit=${getLimitForTF(S.tf)}`,
         {signal:AbortSignal.timeout(30000)});
-      if(r.status===422){const e=await r.json().catch(()=>({}));throw new Error(`无效代码「${sym}」— ${e.detail||'not found'}`);}
+      if(r.status===422){const e=await r.json().catch(()=>({}));throw Object.assign(new Error(`${window.i18n.t('invalidSym')} 「${sym}」— ${e.detail||'not found'}`),{isInvalid:true});}
       if(!r.ok) throw new Error(`HTTP ${r.status}`);
       d=await r.json();
       _tfCache[cacheKey]=d;  // store in cache
     }catch(e){
       // Network/server error only
-      toast(e.message.includes('无效')?e.message:'⚠ '+window.i18n.t('srvOffline')+'\n('+e.message+')');
+      toast(e.isInvalid?e.message:'⚠ '+window.i18n.t('srvOffline')+'\n('+e.message+')');
       setSrv(false);S.serverOk=false;
       showOv(false); return;
     }
@@ -1885,17 +1885,17 @@ function setDrawMode(mode){
   document.getElementById('main-chart').style.cursor =
     mode === 'cursor' ? '' : 'crosshair';
   if (mode !== 'cursor')
-    toast({ hline:'水平线模式 · 点击图表放置', tline:'趋势线即将推出', rect:'矩形即将推出' }[mode] || mode, mode==='hline', 2000);
+    toast({ hline:window.i18n.t('hlineMode'), tline:window.i18n.t('tlineMode'), rect:window.i18n.t('rectMode') }[mode] || mode, mode==='hline', 2000);
 }
 
 function toggleMagnet(){
   _magnetMode = !_magnetMode;
   document.getElementById('draw-magnet').classList.toggle('on', _magnetMode);
-  toast(_magnetMode ? '磁吸模式 ON' : '磁吸模式 OFF', _magnetMode, 1500);
+  toast(_magnetMode ? window.i18n.t('magnetOn') : window.i18n.t('magnetOff'), _magnetMode, 1500);
 }
 
 function undoLastDrawing(){
-  if (!_drawnLines.length){ toast('没有可撤销的绘图'); return; }
+  if (!_drawnLines.length){ toast(window.i18n.t('noUndo')); return; }
   const last = _drawnLines.pop();
   try { last.series.removePriceLine(last.priceLine); } catch{}
 }
@@ -1903,7 +1903,7 @@ function undoLastDrawing(){
 function clearDrawings(){
   _drawnLines.forEach(d => { try { d.series.removePriceLine(d.priceLine); } catch{} });
   _drawnLines = [];
-  toast('已清除所有绘图', true, 1500);
+  toast(window.i18n.t('clearedAll'), true, 1500);
 }
 
 function bindDrawingClick(){
@@ -1924,7 +1924,7 @@ function bindDrawingClick(){
       _drawnLines.push({ series: S.candles, priceLine: pl });
       return;
     }
-    toast({ tline:'趋势线即将推出 · Coming soon', rect:'矩形即将推出 · Coming soon' }[_drawMode] || '', false, 2000);
+    toast({ tline:window.i18n.t('tlineMode'), rect:window.i18n.t('rectMode') }[_drawMode] || '', false, 2000);
   });
 }
 
@@ -1965,7 +1965,7 @@ function savePrefs(){
   localStorage.setItem('iai_prefs', JSON.stringify(prefs));
   // EMA lines fully removed
   closeUserPanel();
-  toast('设置已保存 · Saved', true, 2000);
+  toast(window.i18n.t('settingsSaved'), true, 2000);
 }
 
 // ── EXPORT ───────────────────────────────────────────────────────

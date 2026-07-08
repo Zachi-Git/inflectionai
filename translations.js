@@ -92,6 +92,24 @@ const TRANSLATIONS = {
     // Timeframes
     tf5m:"5m", tf15m:"15m", tf30m:"30m",
     tf1h:"1h", tf4h:"4h", tf1d:"1D", tf1w:"1W", tf1M:"1M",
+    // OHLCV bar labels
+    chgLabel:     "Chg",
+    turnoverLabel:"Turnover",
+    volRatioLabel:"Vol Ratio",
+    // User / Settings
+    userSettings: "Settings",
+    preferences:  "Preferences",
+    // Drawing tools
+    hlineMode:    "H-Line mode · Click chart to place",
+    tlineMode:    "Trend line — coming soon",
+    rectMode:     "Rectangle — coming soon",
+    magnetOn:     "Magnet ON",
+    magnetOff:    "Magnet OFF",
+    noUndo:       "Nothing to undo",
+    clearedAll:   "All drawings cleared",
+    settingsSaved:"Settings saved",
+    // Error / status
+    invalidSym:   "Invalid symbol",
   },
 
   zh: {
@@ -172,6 +190,20 @@ const TRANSLATIONS = {
     affiliateNote:"每成功推荐一位订阅者即可获得佣金。",
     tf5m:"5分", tf15m:"15分", tf30m:"30分",
     tf1h:"1时", tf4h:"4时", tf1d:"日线", tf1w:"周线", tf1M:"月线",
+    chgLabel:     "涨跌",
+    turnoverLabel:"成交额",
+    volRatioLabel:"量比",
+    userSettings: "设置",
+    preferences:  "偏好设置",
+    hlineMode:    "水平线模式 · 点击图表放置",
+    tlineMode:    "趋势线即将推出",
+    rectMode:     "矩形即将推出",
+    magnetOn:     "磁吸模式 ON",
+    magnetOff:    "磁吸模式 OFF",
+    noUndo:       "没有可撤销的绘图",
+    clearedAll:   "已清除所有绘图",
+    settingsSaved:"设置已保存",
+    invalidSym:   "无效代码",
   },
 
   ko: {
@@ -252,6 +284,11 @@ const TRANSLATIONS = {
     affiliateNote:"추천 구독자마다 커미션 획득.",
     tf5m:"5분", tf15m:"15분", tf30m:"30분",
     tf1h:"1시간", tf4h:"4시간", tf1d:"일봉", tf1w:"주봉", tf1M:"월봉",
+    chgLabel:"등락", turnoverLabel:"거래대금", volRatioLabel:"거래량비율",
+    userSettings:"설정", preferences:"환경설정",
+    hlineMode:"수평선 모드 · 차트를 클릭하세요", tlineMode:"추세선 — 준비 중", rectMode:"사각형 — 준비 중",
+    magnetOn:"자석 ON", magnetOff:"자석 OFF", noUndo:"취소할 그림 없음", clearedAll:"모든 그림 삭제됨",
+    settingsSaved:"설정 저장됨", invalidSym:"잘못된 종목 코드",
   },
 
   ja: {
@@ -332,6 +369,11 @@ const TRANSLATIONS = {
     affiliateNote:"紹介した購読者ごとにコミッションを獲得。",
     tf5m:"5分", tf15m:"15分", tf30m:"30分",
     tf1h:"1時間", tf4h:"4時間", tf1d:"日足", tf1w:"週足", tf1M:"月足",
+    chgLabel:"騰落", turnoverLabel:"売買代金", volRatioLabel:"出来高比率",
+    userSettings:"設定", preferences:"設定",
+    hlineMode:"水平線モード · チャートをクリック", tlineMode:"トレンドライン — 近日公開", rectMode:"矩形 — 近日公開",
+    magnetOn:"マグネット ON", magnetOff:"マグネット OFF", noUndo:"取り消す描画なし", clearedAll:"全描画削除済み",
+    settingsSaved:"設定を保存しました", invalidSym:"無効なシンボル",
   },
 
   es: {
@@ -412,6 +454,11 @@ const TRANSLATIONS = {
     affiliateNote:"Gana comisión por cada suscriptor referido.",
     tf5m:"5m", tf15m:"15m", tf30m:"30m",
     tf1h:"1h", tf4h:"4h", tf1d:"1D", tf1w:"1S", tf1M:"1M",
+    chgLabel:"Var.", turnoverLabel:"Volumen $", volRatioLabel:"Ratio Vol.",
+    userSettings:"Ajustes", preferences:"Preferencias",
+    hlineMode:"Línea horizontal · Clic en el gráfico", tlineMode:"Línea de tendencia — próximamente", rectMode:"Rectángulo — próximamente",
+    magnetOn:"Imán ON", magnetOff:"Imán OFF", noUndo:"Sin dibujos que deshacer", clearedAll:"Todos los dibujos eliminados",
+    settingsSaved:"Ajustes guardados", invalidSym:"Símbolo inválido",
   },
 };
 

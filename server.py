@@ -165,19 +165,19 @@ except ImportError:
             prev  = above.shift(1).fillna(above)
             cu = above & ~prev.astype(bool)
             cd = ~above & prev.astype(bool)
-            sigs=[]; peb=pes=None
+            sigs=[]; peb=pes=None; last_dir=None
             for i in range(len(df)):
                 ts=df.index[i]; px=float(df["close"].iloc[i])
-                if cu.iloc[i]:
-                    sigs.append(Sig(ts,"eB",px,"ema_fast_cross_up","bullish",0.55))
-                    peb=i; pes=None
-                elif cd.iloc[i]:
-                    sigs.append(Sig(ts,"eS",px,"ema_fast_cross_down","bearish",0.55))
-                    pes=i; peb=None
+                if cu.iloc[i] and last_dir != 'UP':
+                    sigs.append(Sig(ts,"eB",px,"ema_fast_cross_up","UP",0.55))
+                    peb=i; pes=None; last_dir='UP'
+                elif cd.iloc[i] and last_dir != 'DOWN':
+                    sigs.append(Sig(ts,"eS",px,"ema_fast_cross_down","DOWN",0.55))
+                    pes=i; peb=None; last_dir='DOWN'
                 if peb is not None and (i-peb)==self.confirm_window:
-                    sigs.append(Sig(ts,"B",px,"confirm_window_2","bullish",0.9)); peb=None
+                    sigs.append(Sig(ts,"B",px,"confirm_window_2","UP",0.9)); peb=None
                 if pes is not None and (i-pes)==self.confirm_window:
-                    sigs.append(Sig(ts,"S",px,"confirm_window_2","bearish",0.9)); pes=None
+                    sigs.append(Sig(ts,"S",px,"confirm_window_2","DOWN",0.9)); pes=None
             return sigs
 
 

@@ -1823,12 +1823,14 @@ function updateWLActive(sym){
 
 async function fetchWLItem(sym){
   try {
-    const r = await fetch(`${API}/api/price?symbol=${sym}`,
+    const r = await fetch(`${API}/api/snapshot?symbol=${sym}&tf=1d&limit=30`,
       { signal: AbortSignal.timeout(25000) });
     if (!r.ok) return;
     const d = await r.json();
-    if (d.price == null) return;
-    _wlData[sym] = { price: d.price, chg: d.chg };
+    const bars = d.bars || [];
+    if (bars.length < 2) return;
+    const last = bars[bars.length-1], prev = bars[bars.length-2];
+    _wlData[sym] = { price: last.close, chg: (last.close-prev.close)/prev.close*100 };
   } catch { /* silent */ }
 }
 

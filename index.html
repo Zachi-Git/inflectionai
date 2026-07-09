@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>73times Â· Signal Hunter</title>
+<title>73times · Signal Hunter</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <script src="translations.js"></script>
 <style>
@@ -279,7 +279,6 @@ input::placeholder{color:var(--t3)}
 #paypal-btn-container{min-height:40px}
 
 
-
 /* Other methods (coming soon) */
 .other-methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px 24px 20px}
 .other-btn{display:flex;align-items:center;gap:8px;padding:10px 12px;
@@ -303,7 +302,7 @@ footer{height:var(--fh);display:flex;align-items:center;justify-content:space-be
 footer a{color:var(--t3);text-decoration:none}
 footer a:hover{color:var(--t2)}
 
-/* âââ LIGHT THEME ââââââââââââââââââââââââââââââââââââââââââââ */
+/* ═══ LIGHT THEME ════════════════════════════════════════════ */
 body.light{
   --bg:#f0f3fa;--surf:#ffffff;--card:#ffffff;--card2:#e8ecf5;
   --bd:#dde1ec;--bd2:#c8cfe0;
@@ -318,7 +317,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
   display:flex;align-items:center;justify-content:center;transition:all .15s}
 .theme-btn:hover{border-color:var(--blue);color:var(--blue)}
 
-/* âââ SIGNAL ALERT BANNER (TrendSpider) ââââââââââââââââââââââ */
+/* ═══ SIGNAL ALERT BANNER (TrendSpider) ══════════════════════ */
 #sig-banner{display:none;align-items:center;justify-content:space-between;
   padding:6px 14px;font-size:11px;font-weight:600;flex-shrink:0;
   border-bottom:1px solid;animation:fadeSlide .3s ease}
@@ -329,7 +328,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 #sig-banner .banner-close:hover{opacity:1}
 @keyframes fadeSlide{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
-/* âââ OHLCV CROSSHAIR ROW (TradingView) âââââââââââââââââââââ */
+/* ═══ OHLCV CROSSHAIR ROW (TradingView) ═════════════════════ */
 #ohlcv-row{display:none;align-items:center;gap:14px;font-size:10px;flex-shrink:0;
   padding:4px 14px;background:var(--surf);border-bottom:1px solid var(--bd)}
 #ohlcv-row.show{display:flex}
@@ -339,7 +338,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 .ohlcv-sig.B,.ohlcv-sig.eB{background:rgba(245,197,24,.2);color:var(--yellow)}
 .ohlcv-sig.S,.ohlcv-sig.eS{background:rgba(240,98,146,.2);color:var(--pink)}
 
-/* âââ QUICK SYMBOL CHIPS (Koyfin) ââââââââââââââââââââââââââââ */
+/* ═══ QUICK SYMBOL CHIPS (Koyfin) ════════════════════════════ */
 .sym-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .chip{padding:3px 8px;border:1px solid var(--bd2);border-radius:12px;
   font-size:10px;font-weight:600;color:var(--t2);cursor:pointer;
@@ -347,7 +346,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 .chip:hover{border-color:var(--blue);color:var(--blue);background:rgba(41,98,255,.07)}
 .chip.active{border-color:var(--blue);color:var(--blue);background:rgba(41,98,255,.12)}
 
-/* âââ WATCHLIST (TrendSpider Smart Watchlist) ââââââââââââââââ */
+/* ═══ WATCHLIST (TrendSpider Smart Watchlist) ════════════════ */
 .wl-row{display:flex;align-items:center;gap:6px;padding:5px 0;
   border-bottom:1px solid var(--bd);cursor:pointer;font-size:11px;
   transition:background .1s;margin:0 -14px;padding:5px 14px}
@@ -372,7 +371,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 .wl-add-btn:hover{border-color:var(--blue);color:var(--blue)}
 .wl-empty{color:var(--t3);font-size:11px;padding:6px 0}
 
-/* âââ MOBILE (< 768px) ââââââââââââââââââââââââââââââââââââââ */
+/* ═══ MOBILE (< 768px) ══════════════════════════════════════ */
 @media(max-width:768px){
   #wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;
     height:calc(100vh - var(--hh) - var(--fh) - 48px)}
@@ -391,7 +390,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 .mob-nav-btn.active{color:var(--blue)}
 .mob-nav-btn .mn-icon{font-size:16px}
 
-/* âââ DRAWING TOOLBAR ââââââââââââââââââââââââââââââââââââââââ */
+/* ═══ DRAWING TOOLBAR ════════════════════════════════════════ */
 .chart-hdr{height:auto!important;min-height:44px;flex-wrap:wrap;gap:6px;padding:6px 12px}
 .draw-toolbar{display:flex;align-items:center;gap:2px;background:var(--card2);
   border:1px solid var(--bd2);border-radius:var(--r);padding:3px;margin-left:auto;flex-shrink:0}
@@ -407,15 +406,15 @@ body.light #main-chart,body.light #sub-chart{filter:none}
   font-size:9px;white-space:nowrap;padding:2px 5px;pointer-events:none;display:none;z-index:100}
 .draw-btn:hover .draw-tip{display:block}
 
-/* âââ EXTENDED OHLCV ROW âââââââââââââââââââââââââââââââââââââ */
+/* ═══ EXTENDED OHLCV ROW ═════════════════════════════════════ */
 #ohlcv-row{gap:10px;padding:4px 14px;font-size:10px}
 .ohlcv-sep{width:1px;height:14px;background:var(--bd2);flex-shrink:0}
 #ov-chgamt,#ov-chgpct{font-weight:600}
 
-/* âââ VOL SUB-CHART INFO ââââââââââââââââââââââââââââââââââââ= */
+/* ═══ VOL SUB-CHART INFO ════════════════════════════════════= */
 #vol-crosshair-info{font-size:9px;color:var(--text);font-weight:600;margin-left:6px;opacity:.9}
 
-/* âââ USER BUTTON & PANEL ââââââââââââââââââââââââââââââââââââ */
+/* ═══ USER BUTTON & PANEL ════════════════════════════════════ */
 .user-wrap{position:relative}
 .user-btn{width:32px;height:32px;border:2px solid rgba(41,98,255,.4);border-radius:50%;
   background:linear-gradient(135deg,#1e3a5f 0%,#2962ff 100%);
@@ -462,15 +461,15 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 
 <!-- Loading -->
 <div id="ov"><div class="spin"></div>
-  <div style="font-size:11px;color:var(--t2)" id="ov-txt">Loadingâ¦</div></div>
+  <div style="font-size:11px;color:var(--t2)" id="ov-txt">Loading…</div></div>
 
 <!-- Toast -->
 <div id="toast"></div>
 
-<!-- âââ SUBSCRIBE MODAL ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ═══ SUBSCRIBE MODAL ══════════════════════════════════════════ -->
 <div class="modal-bg" id="sub-modal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeSub()">â</button>
+    <button class="modal-close" onclick="closeSub()">✕</button>
 
     <div class="sub-head">
       <div class="sub-title" data-i18n="modalTitle">Subscribe</div>
@@ -485,7 +484,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         <div class="mp-per">/ week</div>
       </div>
       <div class="mp sel" data-plan="monthly" onclick="selPlan(this)">
-        <div class="mp-badge">â BEST</div>
+        <div class="mp-badge">★ BEST</div>
         <div class="mp-name">Monthly</div>
         <div class="mp-price">$19.90</div>
         <div class="mp-per">/ month</div>
@@ -505,11 +504,11 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     <!-- Payment tabs -->
     <div class="pay-tabs">
       <button class="pay-tab on"  onclick="setPayTab('paypal',this)">PayPal</button>
-            <button class="pay-tab"     onclick="setPayTab('card',this)">ð³ Card</button>
-      <button class="pay-tab"     onclick="setPayTab('alipay',this)">æ¯ä»å® / å¾®ä¿¡</button>
+      <button class="pay-tab"     onclick="setPayTab('card',this)">💳 Card</button>
+      <button class="pay-tab"     onclick="setPayTab('alipay',this)">支付宝 / 微信</button>
     </div>
 
-    <!-- ââ PayPal panel ââ -->
+    <!-- ── PayPal panel ── -->
     <div class="pay-panel on" id="panel-paypal">
       <div class="pay-email-row">
         <div class="pay-email-lbl">Email</div>
@@ -522,63 +521,30 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         </button>
       </div>
       <div id="paypal-status" style="font-size:11px;color:var(--t2);margin-top:6px"></div>
-      <div class="pay-secure">ð Secure Â· Cancel anytime</div>
+      <div class="pay-secure">🔒 Secure · Cancel anytime</div>
     </div>
 
-    <!-- ââ USDT panel ââ -->
-    <div class="pay-panel" id="panel-usdt">
-      <div class="pay-email-row">
-        <div class="pay-email-lbl">Email</div>
-        <input type="email" id="sub-email-usdt" placeholder="your@email.com">
-      </div>
-      <button class="btn-primary" onclick="showUSDTWallet()">Get USDT Wallet Address</button>
-
-      <div id="usdt-result" style="display:none;margin-top:10px">
-        <!-- QR + address -->
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <img id="usdt-qr" src="" alt="QR" width="100" height="100"
-               style="border-radius:6px;border:1px solid var(--bd2);flex-shrink:0">
-          <div style="flex:1;min-width:0">
-            <div class="usdt-addr-lbl">Send exactly <strong id="usdt-amount-display" style="color:var(--yellow)">â</strong> USDT (TRC20)</div>
-            <div class="usdt-addr" id="usdt-addr" style="margin-top:4px;word-break:break-all">â</div>
-            <button class="usdt-copy-btn" onclick="copyUSDTAddr()" style="margin-top:6px">ð Copy Address</button>
-          </div>
-        </div>
-        <div class="usdt-note" style="margin-top:8px">
-          â  TRC20 network only. After sending, paste your TX hash below for verification.
-        </div>
-        <!-- TX hash submission -->
-        <div class="pay-email-row" style="margin-top:8px">
-          <div class="pay-email-lbl">TX Hash</div>
-          <input type="text" id="usdt-tx-input" placeholder="Paste your transaction hashâ¦" style="font-family:monospace;font-size:11px">
-        </div>
-        <button class="btn-primary" onclick="submitUSDTTx()" style="margin-top:6px">â Submit TX for Verification</button>
-        <div id="usdt-submit-status" style="font-size:11px;margin-top:6px;color:var(--t2)"></div>
-      </div>
-      <div class="pay-secure" style="margin-top:10px">ð Verified within 24h Â· Email confirmation</div>
-    </div>
-
-    <!-- ââ Card (Stripe) panel ââ -->
+    <!-- ── Card (Stripe) panel ── -->
     <div class="pay-panel" id="panel-card">
       <div class="pay-email-row">
         <div class="pay-email-lbl">Email</div>
         <input type="email" id="sub-email-card" placeholder="your@email.com">
       </div>
       <button class="btn-primary" onclick="startStripeCheckout()">
-        ð³ Pay with Card (Stripe)
+        💳 Pay with Card (Stripe)
       </button>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center">
         <span style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 7px;border-radius:3px">VISA</span>
-        <span style="font-size:11px">ð³ Mastercard</span>
-        <span style="font-size:11px">ð Apple Pay</span>
-        <span style="font-size:11px">ð¦ Google Pay</span>
-        <span style="font-size:11px">ðºð¸ Amex</span>
+        <span style="font-size:11px">💳 Mastercard</span>
+        <span style="font-size:11px">🍎 Apple Pay</span>
+        <span style="font-size:11px">🟦 Google Pay</span>
+        <span style="font-size:11px">🇺🇸 Amex</span>
       </div>
-      <div class="pay-secure" style="margin-top:8px">ð Powered by Stripe Â· 256-bit SSL</div>
+      <div class="pay-secure" style="margin-top:8px">🔒 Powered by Stripe · 256-bit SSL</div>
       <div id="card-status" style="font-size:11px;color:var(--t2);margin-top:4px"></div>
     </div>
 
-    <!-- ââ Alipay / WeChat panel ââ -->
+    <!-- ── Alipay / WeChat panel ── -->
     <div class="pay-panel" id="panel-alipay">
       <div class="pay-email-row">
         <div class="pay-email-lbl">Email</div>
@@ -587,25 +553,25 @@ body.light #main-chart,body.light #sub-chart{filter:none}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
         <button class="btn-primary" onclick="startAlipayCheckout('alipay')"
                 style="background:linear-gradient(135deg,#1677FF,#006EFF)">
-          ðµ æ¯ä»å® Alipay
+          🔵 支付宝 Alipay
         </button>
         <button class="btn-primary" onclick="startAlipayCheckout('wechat_pay')"
                 style="background:linear-gradient(135deg,#07C160,#00A050)">
-          ð¢ å¾®ä¿¡ WeChat Pay
+          🟢 微信 WeChat Pay
         </button>
       </div>
-      <div class="pay-secure" style="margin-top:8px">ð Powered by Stripe Â· One-time payment</div>
+      <div class="pay-secure" style="margin-top:8px">🔒 Powered by Stripe · One-time payment</div>
       <div id="alipay-status" style="font-size:11px;color:var(--t2);margin-top:4px"></div>
     </div>
 
   </div>
 </div>
 
-<!-- âââ HEADER ââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ═══ HEADER ════════════════════════════════════════════════════ -->
 <header>
   <div class="hd-left">
     <div class="logo">
-      <div class="logo-mark">â¡</div>
+      <div class="logo-mark">⚡</div>
       <div>
         <div class="logo-name">73times</div>
         <div class="logo-sub" data-i18n="appSub">AI Inflection Decision System</div>
@@ -617,24 +583,24 @@ body.light #main-chart,body.light #sub-chart{filter:none}
   <div class="hd-right">
     <div class="srv-row">
       <div class="dot spin" id="srv-dot"></div>
-      <span id="srv-txt" data-i18n="srvConnecting">Connectingâ¦</span>
+      <span id="srv-txt" data-i18n="srvConnecting">Connecting…</span>
     </div>
     <!-- Language Switcher -->
     <div class="lang-wrap" id="lang-wrap">
       <button class="lang-btn" onclick="toggleLangDD()">
-        <span id="lang-flag">ðºð¸</span>
+        <span id="lang-flag">🇺🇸</span>
         <span id="lang-label">EN</span>
-        <span class="arrow">â¾</span>
+        <span class="arrow">▾</span>
       </button>
       <div class="lang-dd" id="lang-dd">
-        <div class="lang-opt active" data-lang="en" onclick="changeLang('en')"><span class="lf">ðºð¸</span>English</div>
-        <div class="lang-opt" data-lang="zh" onclick="changeLang('zh')"><span class="lf">ð¨ð³</span>ä¸­æ</div>
-        <div class="lang-opt" data-lang="ko" onclick="changeLang('ko')"><span class="lf">ð°ð·</span>íêµ­ì´</div>
-        <div class="lang-opt" data-lang="ja" onclick="changeLang('ja')"><span class="lf">ð¯ðµ</span>æ¥æ¬èª</div>
-        <div class="lang-opt" data-lang="es" onclick="changeLang('es')"><span class="lf">ðªð¸</span>EspaÃ±ol</div>
+        <div class="lang-opt active" data-lang="en" onclick="changeLang('en')"><span class="lf">🇺🇸</span>English</div>
+        <div class="lang-opt" data-lang="zh" onclick="changeLang('zh')"><span class="lf">🇨🇳</span>中文</div>
+        <div class="lang-opt" data-lang="ko" onclick="changeLang('ko')"><span class="lf">🇰🇷</span>한국어</div>
+        <div class="lang-opt" data-lang="ja" onclick="changeLang('ja')"><span class="lf">🇯🇵</span>日本語</div>
+        <div class="lang-opt" data-lang="es" onclick="changeLang('es')"><span class="lf">🇪🇸</span>Español</div>
       </div>
     </div>
-    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">ð</button>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
     <!-- User Button -->
     <div class="user-wrap" id="user-wrap">
       <button class="user-btn" onclick="toggleUserPanel()" id="user-btn" title="Settings">
@@ -649,7 +615,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <div class="user-dd-name" id="user-dd-name">Guest</div>
           <div class="user-dd-plan">
             <span id="user-plan-tag">FREE Plan</span>
-            &nbsp;Â·&nbsp;<span onclick="openSub();closeUserPanel()">Upgrade â</span>
+            &nbsp;·&nbsp;<span onclick="openSub();closeUserPanel()">Upgrade →</span>
           </div>
         </div>
         <div class="user-dd-sep"></div>
@@ -680,18 +646,18 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <input type="checkbox" id="pref-autoload" checked>
         </div>
         <div class="user-dd-actions">
-          <button class="ud-save" onclick="savePrefs()">ð¾ Save Settings</button>
-          <button class="ud-upgrade" onclick="openSub();closeUserPanel()">â­ Upgrade to PRO</button>
+          <button class="ud-save" onclick="savePrefs()">💾 Save Settings</button>
+          <button class="ud-upgrade" onclick="openSub();closeUserPanel()">⭐ Upgrade to PRO</button>
         </div>
       </div>
     </div>
   </div>
 </header>
 
-<!-- âââ 3-COLUMN ââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ═══ 3-COLUMN ══════════════════════════════════════════════════ -->
 <div id="wrap">
 
-  <!-- ââ LEFT ââ -->
+  <!-- ══ LEFT ══ -->
   <div class="panel panel-l">
 
     <div class="card">
@@ -709,14 +675,14 @@ body.light #main-chart,body.light #sub-chart{filter:none}
               style="transition:stroke-dasharray .5s,stroke .5s"/>
           </svg>
           <div class="gauge-center">
-            <div class="gauge-num" id="g-num">â</div>
+            <div class="gauge-num" id="g-num">—</div>
             <div class="gauge-lbl">Sentiment</div>
           </div>
         </div>
         <div class="sent-rows">
-          <div class="sr"><span data-i18n="bullish">Bullish</span><b style="color:var(--yellow)" id="s-bull">â</b></div>
-          <div class="sr"><span data-i18n="bearish">Bearish</span><b style="color:var(--pink)" id="s-bear">â</b></div>
-          <div class="sr"><span data-i18n="neutral">Neutral</span><b id="s-neut">â</b></div>
+          <div class="sr"><span data-i18n="bullish">Bullish</span><b style="color:var(--yellow)" id="s-bull">—</b></div>
+          <div class="sr"><span data-i18n="bearish">Bearish</span><b style="color:var(--pink)" id="s-bear">—</b></div>
+          <div class="sr"><span data-i18n="neutral">Neutral</span><b id="s-neut">—</b></div>
         </div>
       </div>
       <div class="note" data-i18n="sentimentNote">Derived from signal history on loaded bars</div>
@@ -726,11 +692,11 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     <div class="card">
       <div class="card-t">
         <span>Watchlist</span>
-        <span class="card-tag" id="wl-count" style="cursor:pointer" onclick="refreshWatchlist()">â»</span>
+        <span class="card-tag" id="wl-count" style="cursor:pointer" onclick="refreshWatchlist()">↻</span>
       </div>
       <div id="wl-list"><div class="wl-empty">Add symbols to track signals</div></div>
       <div class="wl-add-row">
-        <input type="text" class="wl-input" id="wl-in" placeholder="Add symbolâ¦"
+        <input type="text" class="wl-input" id="wl-in" placeholder="Add symbol…"
           onkeydown="if(event.key==='Enter')addToWatchlist()">
         <button class="wl-add-btn" onclick="addToWatchlist()">+ Add</button>
       </div>
@@ -741,16 +707,16 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         <span data-i18n="riskCopilot">Risk Copilot</span>
         <span style="font-size:10px;color:var(--t2);font-weight:400" data-i18n="auto">Auto</span>
       </div>
-      <div class="rc-row"><span>Entry Â· å¥åº</span><span class="rc-val w" id="rc-e">â</span></div>
-      <div class="rc-row"><span>Stop Â· æ­¢æ</span><span class="rc-val p" id="rc-s">â</span></div>
-      <div class="rc-row"><span>Targets Â· ç®æ </span><span class="rc-val y" id="rc-t">â</span></div>
-      <div class="rc-row"><span>Confidence Â· å¼ºåº¦</span><span class="rc-val" id="rc-c">â</span></div>
-      <div class="rc-row"><span>Backtest WinRate Â· åæµèç</span><span class="rc-val y" id="rc-w">â</span></div>
+      <div class="rc-row"><span>Entry · 入场</span><span class="rc-val w" id="rc-e">—</span></div>
+      <div class="rc-row"><span>Stop · 止损</span><span class="rc-val p" id="rc-s">—</span></div>
+      <div class="rc-row"><span>Targets · 目标</span><span class="rc-val y" id="rc-t">—</span></div>
+      <div class="rc-row"><span>Confidence · 强度</span><span class="rc-val" id="rc-c">—</span></div>
+      <div class="rc-row"><span>Backtest WinRate · 回测胜率</span><span class="rc-val y" id="rc-w">—</span></div>
     </div>
 
     <!-- DISCLAIMER -->
     <div class="card disclaimer-card">
-      <div class="disclaimer-head">â  Risk Disclosure</div>
+      <div class="disclaimer-head">⚠ Risk Disclosure</div>
       <div class="disclaimer-body">
         The signals and analysis on this platform are for <strong>informational purposes only</strong> and do not constitute financial, investment, or trading advice. Past performance is not indicative of future results. All trading involves substantial risk of loss. You should consult a qualified financial adviser before making any investment decisions. InflectionAI assumes no responsibility for any losses incurred as a result of using this platform.
       </div>
@@ -758,35 +724,34 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 
   </div>
 
-  <!-- ââ CHART ââ -->
+  <!-- ══ CHART ══ -->
   <div id="chart-col">
-    <!-- Signal Alert Banner â TrendSpider inspired -->
+    <!-- Signal Alert Banner — TrendSpider inspired -->
     <div id="sig-banner">
-      <span id="sig-banner-txt">â¡ New signal detected</span>
+      <span id="sig-banner-txt">⚡ New signal detected</span>
       <button class="banner-close" onclick="document.getElementById('sig-banner').className=''">&times;</button>
     </div>
-    <!-- OHLCV crosshair row â extended -->
+    <!-- OHLCV crosshair row — extended -->
     <div id="ohlcv-row">
-      <div class="ohlcv-item">O <span id="ov-o">â</span></div>
-      <div class="ohlcv-item">H <span id="ov-h">â</span></div>
-      <div class="ohlcv-item">L <span id="ov-l">â</span></div>
-      <div class="ohlcv-item">C <span id="ov-c">â</span></div>
+      <div class="ohlcv-item">O <span id="ov-o">—</span></div>
+      <div class="ohlcv-item">H <span id="ov-h">—</span></div>
+      <div class="ohlcv-item">L <span id="ov-l">—</span></div>
+      <div class="ohlcv-item">C <span id="ov-c">—</span></div>
       <div class="ohlcv-sep"></div>
-      <div class="ohlcv-item"><span data-i18n="chgLabel">Chg</span> <span id="ov-chgamt">â</span></div>
-      <div class="ohlcv-item"><span id="ov-chgpct">â</span></div>
+      <div class="ohlcv-item"><span data-i18n="chgLabel">Chg</span> <span id="ov-chgamt">—</span></div>
+      <div class="ohlcv-item"><span id="ov-chgpct">—</span></div>
       <div class="ohlcv-sep"></div>
-      <div class="ohlcv-item"><span data-i18n="turnoverLabel">Turnover</span> <span id="ov-amount">â</span></div>
-      <div class="ohlcv-item"><span data-i18n="volRatioLabel">Vol Ratio</span> <span id="ov-vratio">â</span></div>
-      <div class="ohlcv-item">Vol <span id="ov-v">â</span></div>
+      <div class="ohlcv-item"><span data-i18n="turnoverLabel">Turnover</span> <span id="ov-amount">—</span></div>
+      <div class="ohlcv-item"><span data-i18n="volRatioLabel">Vol Ratio</span> <span id="ov-vratio">—</span></div>
+      <div class="ohlcv-item">Vol <span id="ov-v">—</span></div>
       <span class="ohlcv-sig" id="ov-sig" style="display:none"></span>
     </div>
     <div class="chart-hdr">
       <div class="price-block">
-        <span class="sym-lbl" id="c-sym">â</span>
-        <span class="price-n" id="c-price">â</span>
+        <span class="sym-lbl" id="c-sym">—</span>
+        <span class="price-n" id="c-price">—</span>
         <span class="price-c" id="c-chg"></span>
       </div>
-      <!-- Drawing Toolbar (å³ä¸è§) -->
       <!-- TF Row (时间周期) -->
       <div class="tf-row">
         <button class="tf-btn" data-tf="5m">5m</button>
@@ -798,6 +763,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         <button class="tf-btn" data-tf="1w">1W</button>
         <button class="tf-btn" data-tf="1M">1M</button>
       </div>
+      <!-- Drawing Toolbar (右上角) -->
       <div class="draw-toolbar" id="draw-toolbar">
         <!-- Cursor -->
         <button class="draw-btn on" data-mode="cursor" onclick="setDrawMode('cursor')">
@@ -843,7 +809,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M3 7c0-3 2.2-5 5-5a5 5 0 015 5v1M3 7l3-3M3 7l3 3"/>
           </svg>
-          <span class="draw-tip">Undo (âZ)</span>
+          <span class="draw-tip">Undo (⌘Z)</span>
         </button>
         <!-- Clear All -->
         <button class="draw-btn" onclick="clearDrawings()">
@@ -857,15 +823,15 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     <div class="chart-boxes">
       <div class="cbox cbox-main">
         <div class="cbox-tag">
-          <span id="ct-tag">â Â· 1D</span>
+          <span id="ct-tag">— · 1D</span>
         </div>
-        <div class="shortcut-hint"><kbd>/</kbd> focus Â· <kbd>Enter</kbd> load Â· <kbd>R</kbd> reset</div>
+        <div class="shortcut-hint"><kbd>/</kbd> focus · <kbd>Enter</kbd> load · <kbd>R</kbd> reset</div>
         <div id="main-chart"></div>
       </div>
       <div class="cbox cbox-sub">
         <div class="cbox-tag">
           <span data-i18n="volume">Volume</span>
-          <span style="color:var(--yellow);font-size:9px">â <span data-i18n="maLabel">10D MA</span></span>
+          <span style="color:var(--yellow);font-size:9px">━ <span data-i18n="maLabel">10D MA</span></span>
           <span id="vol-crosshair-info"></span>
         </div>
         <div id="sub-chart"></div>
@@ -873,7 +839,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     </div>
   </div>
 
-  <!-- ââ RIGHT ââ -->
+  <!-- ══ RIGHT ══ -->
   <div class="panel panel-r">
 
     <!-- ── Data Source card ── -->
@@ -904,9 +870,9 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         <input type="text" id="sym-in" value="TSLA" data-i18n-ph="symPlaceholder"
           onkeydown="if(event.key==='Enter')loadSymbol()"
           style="flex:1;margin-bottom:0">
-        <button class="btn-primary" onclick="loadSymbol()" style="width:auto;padding:7px 12px">â</button>
+        <button class="btn-primary" onclick="loadSymbol()" style="width:auto;padding:7px 12px">→</button>
       </div>
-      <!-- Quick symbol chips â Koyfin inspired -->
+      <!-- Quick symbol chips — Koyfin inspired -->
       <div class="sym-chips" id="sym-chips">
         <button class="chip" onclick="quickLoad('TSLA')">TSLA</button>
         <button class="chip" onclick="quickLoad('AAPL')">AAPL</button>
@@ -951,7 +917,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <div class="plan-per" data-i18n="perWeek">/ week</div>
         </div>
         <div class="plan-c sel" data-plan="monthly" onclick="planClick(this)">
-          <div class="plan-badge">â</div>
+          <div class="plan-badge">★</div>
           <div class="plan-name" data-i18n="planMonthly">Monthly</div>
           <div class="plan-price">$19.90</div>
           <div class="plan-per" data-i18n="perMonth">/ month</div>
@@ -962,19 +928,18 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <div class="plan-per" data-i18n="per3Month">3 months</div>
         </div>
         <div class="plan-c" data-plan="yearly" onclick="planClick(this)">
-          <div class="plan-name" data-i18n="planYearly">Yearly ð¥</div>
+          <div class="plan-name" data-i18n="planYearly">Yearly 🔥</div>
           <div class="plan-price">$189</div>
           <div class="plan-per" data-i18n="saveLabel">save 21%</div>
         </div>
       </div>
       <!-- Payment logos -->
       <div class="pay-logos">
-        <span title="PayPal" style="font-size:18px;cursor:default">ð¿ï¸</span>
-        <span title="USDT Crypto" style="font-size:18px;cursor:default">â®</span>
-        <span title="Visa" style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px">VISA</span>
-        <span title="Mastercard" style="font-size:16px">ð³</span>
-        <span title="Alipay æ¯ä»å®" style="color:#1677FF;font-size:12px;font-weight:700">æ¯ä»å®</span>
-        <span title="WeChat Pay å¾®ä¿¡" style="color:#07C160;font-size:12px;font-weight:700">å¾®ä¿¡</span>
+        <span title="PayPal" style="font-size:18px;cursor:default">🅿️</span>
+<span title="Visa" style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px">VISA</span>
+        <span title="Mastercard" style="font-size:16px">💳</span>
+        <span title="Alipay 支付宝" style="color:#1677FF;font-size:12px;font-weight:700">支付宝</span>
+        <span title="WeChat Pay 微信" style="color:#07C160;font-size:12px;font-weight:700">微信</span>
       </div>
       <button class="btn-primary" style="margin-top:8px" onclick="openSub()" data-i18n="subscribeCTA">Subscribe Now</button>
       <button class="btn-outline" onclick="checkMyStatus()" data-i18n="checkStatus">Check Status</button>
@@ -1002,10 +967,10 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 
 <!-- Mobile bottom nav -->
 <nav class="mob-nav" id="mob-nav">
-  <button class="mob-nav-btn" onclick="mobPanel('chart')"><span class="mn-icon">ð</span>Chart</button>
-  <button class="mob-nav-btn" onclick="mobPanel('left')"><span class="mn-icon">ð</span>Signals</button>
-  <button class="mob-nav-btn" onclick="mobPanel('right')"><span class="mn-icon">âï¸</span>Control</button>
-  <button class="mob-nav-btn" onclick="openSub()"><span class="mn-icon">ð</span>Pro</button>
+  <button class="mob-nav-btn" onclick="mobPanel('chart')"><span class="mn-icon">📈</span>Chart</button>
+  <button class="mob-nav-btn" onclick="mobPanel('left')"><span class="mn-icon">📊</span>Signals</button>
+  <button class="mob-nav-btn" onclick="mobPanel('right')"><span class="mn-icon">⚙️</span>Control</button>
+  <button class="mob-nav-btn" onclick="openSub()"><span class="mn-icon">💎</span>Pro</button>
 </nav>
 
 <footer>
@@ -1018,11 +983,11 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 </footer>
 
 <script>
-// ââ API ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── API ──────────────────────────────────────────────────────────
 const API = (location.hostname==='localhost'||location.hostname==='127.0.0.1')
   ? 'http://localhost:8000' : 'https://seven3times-api.onrender.com';
 
-// ââ STATE ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── STATE ────────────────────────────────────────────────────────
 const S = {
   sym:'TSLA', tf:'1d',
   chart:null, candles:null,
@@ -1037,7 +1002,7 @@ function getLimitForTF(tf){
   return {'5m':400,'15m':400,'30m':400,'1h':730,'4h':500,'1d':1260,'1w':260,'1M':120,'1Y':252}[tf]||600;
 }
 
-// ââ INIT âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── INIT ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   // i18n init first
   window.i18n.init();
@@ -1079,21 +1044,21 @@ document.addEventListener('DOMContentLoaded',()=>{
       setTimeout(()=>loadPayPalSDK().catch(()=>{}), 3000);
     });
   });
-  // Watchlist ä¸ä¾èµ chartï¼ç´æ¥å¨ DOMContentLoaded è¿è¡
+  // Watchlist 不依赖 chart，直接在 DOMContentLoaded 运行
   renderWatchlist();
   refreshWatchlist().then(()=>setInterval(refreshWatchlist, 5*60*1000));
 });
 
-// ââ LANGUAGE âââââââââââââââââââââââââââââââââââââââââââââââââââââ
-const LANG_FLAGS={en:'ðºð¸',zh:'ð¨ð³',ko:'ð°ð·',ja:'ð¯ðµ',es:'ðªð¸'};
-const LANG_LABELS={en:'EN',zh:'ä¸­æ',ko:'íêµ­ì´',ja:'æ¥æ¬èª',es:'ES'};
+// ── LANGUAGE ─────────────────────────────────────────────────────
+const LANG_FLAGS={en:'🇺🇸',zh:'🇨🇳',ko:'🇰🇷',ja:'🇯🇵',es:'🇪🇸'};
+const LANG_LABELS={en:'EN',zh:'中文',ko:'한국어',ja:'日本語',es:'ES'};
 
 function toggleLangDD(){
   document.getElementById('lang-dd').classList.toggle('open');
 }
 function changeLang(lang){
   window.i18n.setLang(lang);
-  document.getElementById('lang-flag').textContent = LANG_FLAGS[lang]||'ð';
+  document.getElementById('lang-flag').textContent = LANG_FLAGS[lang]||'🌐';
   document.getElementById('lang-label').textContent = LANG_LABELS[lang]||lang.toUpperCase();
   document.getElementById('lang-dd').classList.remove('open');
   // Re-apply server status text
@@ -1101,7 +1066,7 @@ function changeLang(lang){
   document.getElementById('srv-txt').textContent = window.i18n.t(ok?'srvOnline':'srvOffline');
 }
 
-// ââ SERVER CHECK âââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── SERVER CHECK ─────────────────────────────────────────────────
 async function checkServer(){
   try{
     const r=await fetch(`${API}/api/health`,{signal:AbortSignal.timeout(4000)});
@@ -1133,7 +1098,7 @@ function setSrv(ok,customMsg){
   document.getElementById('srv-txt').textContent = customMsg || window.i18n.t(ok?'srvOnline':'srvOffline');
 }
 
-// ââ KEYBOARD SHORTCUTS âââââââââââââââââââââââââââââââââââââââââââ
+// ── KEYBOARD SHORTCUTS ───────────────────────────────────────────
 function bindKeyboard(){
   document.addEventListener('keydown',e=>{
     if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
@@ -1149,7 +1114,7 @@ function bindKeyboard(){
   });
 }
 
-// ââ CHARTS INIT ââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── CHARTS INIT ──────────────────────────────────────────────────
 function initCharts(){
   const base={
     layout:{background:{color:'transparent'},textColor:'#787b86'},
@@ -1165,7 +1130,7 @@ function initCharts(){
   const mRect=mEl.getBoundingClientRect();
   const mW=mRect.width||mEl.clientWidth||mEl.parentElement.clientWidth||800;
   const mH=mRect.height||mEl.clientHeight||mEl.parentElement.clientHeight||400;
-  // Fixed price scale width = 70px on both charts â identical content widths â crosshair lines up
+  // Fixed price scale width = 70px on both charts → identical content widths → crosshair lines up
   const PSCALE_W = 70;
   S.chart=LightweightCharts.createChart(mEl,{...base,width:mW,height:mH,
     rightPriceScale:{...base.rightPriceScale,width:PSCALE_W}});
@@ -1185,7 +1150,7 @@ function initCharts(){
   });
   S.volHist=S.subChart.addHistogramSeries({priceLineVisible:false,lastValueVisible:false,priceFormat:{type:'volume'}});
   S.volMA=S.subChart.addLineSeries({color:YELLOW,lineWidth:1.5,priceLineVisible:false,lastValueVisible:false});
-  // Sync by logical range (index-based) â more precise than time range for crosshair alignment
+  // Sync by logical range (index-based) — more precise than time range for crosshair alignment
   S.chart.timeScale().subscribeVisibleLogicalRangeChange(r=>{
     if(!S.syncing&&r){S.syncing=true;S.subChart.timeScale().setVisibleLogicalRange(r);S.syncing=false;}
   });
@@ -1198,12 +1163,12 @@ function initCharts(){
   }).observe(mEl.parentElement);
 }
 
-// ââ TF CACHE âââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// Key: `${sym}_${tf}`, Value: snapshot JSON â cleared when sym changes
+// ── TF CACHE ─────────────────────────────────────────────────────
+// Key: `${sym}_${tf}`, Value: snapshot JSON — cleared when sym changes
 const _tfCache = {};
 let   _cacheSymKey = '';  // tracks which symbol the cache belongs to
 
-// ââ LOAD âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── LOAD ─────────────────────────────────────────────────────────
 async function loadSymbol(){
   const sym=(document.getElementById('sym-in').value||'TSLA').trim().toUpperCase();
   S.sym=sym; document.getElementById('sym-in').value=sym;
@@ -1215,37 +1180,37 @@ async function loadSymbol(){
   let d = _tfCache[cacheKey] || null;
 
   if(!d){
-    showOv(true,`Loading ${sym} [${S.tf.toUpperCase()}]â¦`);
+    showOv(true,`Loading ${sym} [${S.tf.toUpperCase()}]…`);
     try{
-      // ââ 1. Network: check server + fetch data ââââââââââââââââââââââ
+      // ── 1. Network: check server + fetch data ──────────────────────
       if(!S.serverOk) await checkServer();
-      if(!S.serverOk){toast('â  '+window.i18n.t('srvOffline'));return;}
+      if(!S.serverOk){toast('⚠ '+window.i18n.t('srvOffline'));return;}
       const r=await fetch(`${API}/api/snapshot?symbol=${sym}&tf=${S.tf}&limit=${getLimitForTF(S.tf)}`,
         {signal:AbortSignal.timeout(30000)});
-      if(r.status===422){const e=await r.json().catch(()=>({}));throw Object.assign(new Error(`${window.i18n.t('invalidSym')} ã${sym}ãâ ${e.detail||'not found'}`),{isInvalid:true});}
+      if(r.status===422){const e=await r.json().catch(()=>({}));throw Object.assign(new Error(`${window.i18n.t('invalidSym')} 「${sym}」— ${e.detail||'not found'}`),{isInvalid:true});}
       if(!r.ok) throw new Error(`HTTP ${r.status}`);
       d=await r.json();
       _tfCache[cacheKey]=d;  // store in cache
     }catch(e){
       // Network/server error only
-      toast(e.isInvalid?e.message:'â  '+window.i18n.t('srvOffline')+'\n('+e.message+')');
+      toast(e.isInvalid?e.message:'⚠ '+window.i18n.t('srvOffline')+'\n('+e.message+')');
       setSrv(false);S.serverOk=false;
       showOv(false); return;
     }
   }
 
   S.bars=d.bars||[];S.signals=d.signals||[];
-  // ââ 2. Update server status IMMEDIATELY after data received ââââ
+  // ── 2. Update server status IMMEDIATELY after data received ────
   S.serverOk=true;
   setSrv(true);
   _clearRetry();
-  // ââ 3. Render (separate from network error handling) ââââââââââââ
+  // ── 3. Render (separate from network error handling) ────────────
   try{
     if(!S.candles){await new Promise(r=>setTimeout(r,200));initCharts();}
     renderCandles(d);renderVolume();renderMarkers();
     updateTopbar();updateLeft();showLastBar();
     scrollToLast120();
-    document.getElementById('ct-tag').textContent=`${sym} Â· ${S.tf.toUpperCase()}`;
+    document.getElementById('ct-tag').textContent=`${sym} · ${S.tf.toUpperCase()}`;
     showSignalBanner(S.signals, S.bars);
     bindCrosshair();
     document.querySelectorAll('.chip').forEach(c=>
@@ -1256,7 +1221,7 @@ async function loadSymbol(){
   }finally{showOv(false);}
 }
 
-// ââ RENDER âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── RENDER ───────────────────────────────────────────────────────
 function renderCandles(d){
   S.candles.setData((d.bars||[]).map(b=>({time:b.time,open:b.open,high:b.high,low:b.low,close:b.close})));
 }
@@ -1284,7 +1249,8 @@ function renderMarkers(){
     })
     .map(s=>{
       const bull=['B','eB'].includes(s.side),conf=s.side==='B'||s.side==='S';
-      const shape=s.side==='B'?'circle':s.side==='S'?'circle':bull?'arrowUp':'arrowDown';
+      // B/S confirmed signals: circle shape (larger, distinct); eB/eS early: arrow
+      const shape = s.side==='B'?'circle':s.side==='S'?'circle':bull?'arrowUp':'arrowDown';
       return{time:s.time,position:bull?'belowBar':'aboveBar',
         color:bull?YELLOW:PINK,shape,
         text:s.side,size:conf?2:1};
@@ -1292,7 +1258,7 @@ function renderMarkers(){
   S.candles.setMarkers(markers);
 }
 
-// ââ LEFT PANEL âââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── LEFT PANEL ───────────────────────────────────────────────────
 function updateLeft(){
   const sigs=S.signals,bars=S.bars;
   const recent=sigs.slice(-30);
@@ -1306,7 +1272,7 @@ function updateLeft(){
   const trades=[];let ob=null;
   sigs.forEach(s=>{if(s.side==='B'&&!ob)ob=s;else if(s.side==='S'&&ob){trades.push(s.price-ob.price);ob=null;}});
   const wr=trades.length?Math.round(trades.filter(p=>p>0).length/trades.length*100):null;
-  set('rc-w',wr!==null?`${wr}%  (${trades.length})`:'â');
+  set('rc-w',wr!==null?`${wr}%  (${trades.length})`:'—');
   const lastB=[...sigs].reverse().find(s=>s.side==='B'||s.side==='eB');
   if(lastB&&bars.length>14){
     const atr=calcATR(bars,14),e=+lastB.price;
@@ -1343,7 +1309,7 @@ function updateTopbar(){
   el.className='price-c '+(chg>=0?'up':'dn');
 }
 
-// ââ UTILS ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── UTILS ────────────────────────────────────────────────────────
 function calcATR(bars,n=14){
   if(!bars||bars.length<n+1) return 1;
   const sl=bars.slice(-n-1);let s=0;
@@ -1367,7 +1333,7 @@ function toast(msg,ok=false,dur=4000){
   setTimeout(()=>t.className='',dur);
 }
 
-// ââ TF âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── TF ───────────────────────────────────────────────────────────
 function bindTF(){
   document.querySelectorAll('.tf-btn').forEach(b=>b.addEventListener('click',()=>{
     setTF(b.dataset.tf);loadSymbol();
@@ -1385,7 +1351,7 @@ function toggleSig(t){
 }
 function tog(id,on){document.getElementById(id).className='tog'+(on?' on':'');}
 
-// ââ PAYMENT MODAL ââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── PAYMENT MODAL ────────────────────────────────────────────────
 let _selPlan = 'monthly';
 let _ppSDKLoaded = false;
 
@@ -1410,7 +1376,7 @@ function setPayTab(name,btn){
   if(name==='paypal' && !_ppSDKLoaded) loadPayPalSDK();
 }
 
-// ââ PayPal JS SDK âââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── PayPal JS SDK ─────────────────────────────────────────────────
 async function loadPayPalSDK(){
   const status = document.getElementById('paypal-status');
   if(_ppSDKLoaded){ _renderPayPalBtn(); return; }
@@ -1458,7 +1424,7 @@ function _renderPayPalBtn(){
     onApprove: async(data)=>{
       const email=document.getElementById('sub-email').value.trim();
       const ps=document.getElementById('paypal-status');
-      if(ps) ps.textContent='Capturing paymentâ¦';
+      if(ps) ps.textContent='Capturing payment…';
       const r=await fetch(`${API}/api/paypal/capture-order`,{
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({order_id:data.orderID, email, plan:_selPlan}),
@@ -1466,7 +1432,7 @@ function _renderPayPalBtn(){
       const d=await r.json();
       if(d.success){
         closeSub();
-        toast('ð Payment successful! Welcome to PRO.', true, 6000);
+        toast('🎉 Payment successful! Welcome to PRO.', true, 6000);
         set('sub-tag','PRO'); set('user-plan-tag','PRO Plan');
       } else {
         toast('Capture failed: '+(d.detail||'unknown error'));
@@ -1477,50 +1443,12 @@ function _renderPayPalBtn(){
   }).render('#paypal-btn-container');
 }
 
-// ââ USDT Manual Wallet ââââââââââââââââââââââââââââââââââââââââââââ
-async function showUSDTWallet(){
-  const email=document.getElementById('sub-email-usdt').value.trim();
-  if(!email||!email.includes('@')){ toast('Enter a valid email first'); return; }
-  try{
-    const r=await fetch(`${API}/api/usdt/wallet?plan=${_selPlan}&email=${encodeURIComponent(email)}`);
-    const d=await r.json();
-    if(d.detail) throw new Error(d.detail);
-    document.getElementById('usdt-addr').textContent = d.address;
-    document.getElementById('usdt-amount-display').textContent = d.amount;
-    // QR code via free public API (loaded by user's browser, not server)
-    document.getElementById('usdt-qr').src =
-      `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(d.address)}`;
-    document.getElementById('usdt-result').style.display='block';
-  }catch(e){ toast('USDT: '+e.message); }
-}
-
-function copyUSDTAddr(){
-  const addr=document.getElementById('usdt-addr').textContent;
-  navigator.clipboard?.writeText(addr).then(()=>toast('Address copied!',true,2000));
-}
-
-async function submitUSDTTx(){
-  const email=document.getElementById('sub-email-usdt').value.trim();
-  const txHash=document.getElementById('usdt-tx-input').value.trim();
-  const statusEl=document.getElementById('usdt-submit-status');
-  if(!txHash){ toast('Paste your TX hash first'); return; }
-  try{
-    const r=await fetch(`${API}/api/usdt/submit`,{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email, plan:_selPlan, tx_hash:txHash}),
-    });
-    const d=await r.json();
-    if(statusEl) statusEl.textContent = 'â '+d.message;
-    toast('TX submitted! We\'ll email you upon activation.', true, 5000);
-  }catch(e){ toast('Submit error: '+e.message); }
-}
-
-// ââ Stripe Card Checkout ââââââââââââââââââââââââââââââââââââââââââ
+// ── Stripe Card Checkout ──────────────────────────────────────────
 async function startStripeCheckout(){
   const email=document.getElementById('sub-email-card').value.trim();
   if(!email||!email.includes('@')){ toast('Enter a valid email first'); return; }
   const statusEl=document.getElementById('card-status');
-  if(statusEl) statusEl.textContent='Redirecting to Stripeâ¦';
+  if(statusEl) statusEl.textContent='Redirecting to Stripe…';
   try{
     const r=await fetch(`${API}/api/subscribe/create-checkout`,{
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -1536,13 +1464,13 @@ async function startStripeCheckout(){
   }
 }
 
-// ââ Alipay / WeChat Pay (via Stripe) âââââââââââââââââââââââââââââ
+// ── Alipay / WeChat Pay (via Stripe) ─────────────────────────────
 async function startAlipayCheckout(method){
   const email=document.getElementById('sub-email-alipay').value.trim();
   if(!email||!email.includes('@')){ toast('Enter a valid email first'); return; }
   const statusEl=document.getElementById('alipay-status');
   const label = method==='alipay'?'Alipay':'WeChat Pay';
-  if(statusEl) statusEl.textContent=`Redirecting to ${label}â¦`;
+  if(statusEl) statusEl.textContent=`Redirecting to ${label}…`;
   try{
     const r=await fetch(`${API}/api/subscribe/alipay-checkout`,{
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -1558,14 +1486,14 @@ async function startAlipayCheckout(method){
   }
 }
 
-// ââ Status check / Return URL handling âââââââââââââââââââââââââââ
+// ── Status check / Return URL handling ───────────────────────────
 async function checkMyStatus(){
   const email=prompt('Enter your email:');
   if(!email) return;
   try{
     const r=await fetch(`${API}/api/user/status?email=${encodeURIComponent(email)}`);
     const d=await r.json();
-    set('sub-note', d.active?`â Active Â· ${d.plan} Â· expires ${d.expires?.slice(0,10)}`:'No active subscription found.');
+    set('sub-note', d.active?`✓ Active · ${d.plan} · expires ${d.expires?.slice(0,10)}`:'No active subscription found.');
     set('sub-tag', d.active?'PRO':'FREE');
   }catch{ set('sub-note','Error checking status.'); }
 }
@@ -1574,7 +1502,7 @@ function checkReturnFromStripe(){
   const p=new URLSearchParams(location.search);
   // Stripe card return
   if(p.get('stripe')==='success'){
-    toast('ð Payment successful! Welcome to PRO.', true, 6000);
+    toast('🎉 Payment successful! Welcome to PRO.', true, 6000);
     set('sub-tag','PRO'); set('user-plan-tag','PRO Plan');
   }
   if(p.get('stripe')==='canceled') toast('Payment cancelled.',false,3000);
@@ -1588,8 +1516,8 @@ function checkReturnFromStripe(){
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({order_id:orderId, email, plan}),
       }).then(r=>r.json()).then(d=>{
-        if(d.success) toast('ð PayPal payment confirmed! Welcome to PRO.', true, 6000);
-        else toast('PayPal capture issue â contact support with order ID: '+orderId);
+        if(d.success) toast('🎉 PayPal payment confirmed! Welcome to PRO.', true, 6000);
+        else toast('PayPal capture issue — contact support with order ID: '+orderId);
       });
     }
     set('sub-tag','PRO');
@@ -1600,14 +1528,14 @@ function checkReturnFromStripe(){
     history.replaceState({},'',location.pathname);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // FEATURE 1: LIGHT / DARK THEME TOGGLE  (Unusual Whales inspired)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 let _darkMode = localStorage.getItem('iai_theme') !== 'light';
 
 function applyTheme(){
   document.body.classList.toggle('light', !_darkMode);
-  document.getElementById('theme-btn').textContent = _darkMode ? 'ð' : 'âï¸';
+  document.getElementById('theme-btn').textContent = _darkMode ? '🌙' : '☀️';
   // Update chart backgrounds
   const bg   = _darkMode ? '#131722' : '#f0f3fa';
   const text = _darkMode ? '#787b86' : '#5d6378';
@@ -1626,34 +1554,34 @@ function toggleTheme(){
   applyTheme();
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // FEATURE 2: SIGNAL ALERT BANNER  (TrendSpider inspired)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 function showSignalBanner(signals, bars){
   const banner = document.getElementById('sig-banner');
   if (!signals.length || !bars.length) { banner.className = ''; return; }
-  // Find most recent signal â show if within last 5 bars
+  // Find most recent signal — show if within last 5 bars
   const lastSig  = signals[signals.length - 1];
   const lastBar  = bars[bars.length - 1];
   const barsAgo  = bars.filter(b => b.time >= lastSig.time).length - 1;
   if (barsAgo > 5) { banner.className = ''; return; }
   const bull  = ['B','eB'].includes(lastSig.side);
-  const label = { B:'â Confirmed Buy', eB:'â¡ Early Buy', S:'ð´ Confirmed Sell', eS:'â ï¸ Early Sell' }[lastSig.side] || lastSig.side;
+  const label = { B:'✅ Confirmed Buy', eB:'⚡ Early Buy', S:'🔴 Confirmed Sell', eS:'⚠️ Early Sell' }[lastSig.side] || lastSig.side;
   const date  = new Date(lastSig.time * 1000).toISOString().slice(0, 10);
   document.getElementById('sig-banner-txt').textContent =
-    `${label} Â· ${S.sym} Â· $${(+lastSig.price).toFixed(2)} Â· ${date} Â· ${barsAgo === 0 ? 'Latest bar' : barsAgo + ' bars ago'}`;
+    `${label} · ${S.sym} · $${(+lastSig.price).toFixed(2)} · ${date} · ${barsAgo === 0 ? 'Latest bar' : barsAgo + ' bars ago'}`;
   banner.className = 'show ' + (bull ? 'bull' : 'bear');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // OHLCV LAST-BAR DEFAULT (pin to latest bar when not hovering)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 function showLastBar(){
   if(!S.bars.length) return;
   const n=S.bars.length, bar=S.bars[n-1], prev=n>1?S.bars[n-2]:null;
   const fmt=v=>(+v).toFixed(2);
-  const fmtVol=v=>{if(!v)return'â';if(v>=1e8)return(v/1e6).toFixed(0)+'M';if(v>=1e6)return(v/1e6).toFixed(2)+'M';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return String(v);};
-  const fmtAmt=v=>{if(!v)return'â';if(v>=1e9)return'$'+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(1)+'M';return'$'+v.toFixed(0);};
+  const fmtVol=v=>{if(!v)return'—';if(v>=1e8)return(v/1e6).toFixed(0)+'M';if(v>=1e6)return(v/1e6).toFixed(2)+'M';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return String(v);};
+  const fmtAmt=v=>{if(!v)return'—';if(v>=1e9)return'$'+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(1)+'M';return'$'+v.toFixed(0);};
   document.getElementById('ov-o').textContent=fmt(bar.open);
   document.getElementById('ov-h').textContent=fmt(bar.high);
   document.getElementById('ov-l').textContent=fmt(bar.low);
@@ -1670,14 +1598,14 @@ function showLastBar(){
   document.getElementById('ov-v').textContent=fmtVol(vol);
   document.getElementById('ov-amount').textContent=fmtAmt(bar.close*vol);
   const vEl=document.getElementById('ov-vratio');
-  vEl.textContent=vr?vr.toFixed(2)+'x':'â';
+  vEl.textContent=vr?vr.toFixed(2)+'x':'—';
   vEl.style.color=vr>=1.73?'var(--yellow)':vr>0?'var(--text)':'var(--t2)';
   document.getElementById('ohlcv-row').classList.add('show');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// FEATURE 3: OHLCV CROSSHAIR ROW â extended + volume sync
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
+// FEATURE 3: OHLCV CROSSHAIR ROW — extended + volume sync
+// ═══════════════════════════════════════════════════════════════
 let _lastCrosshairPrice = null;
 let _lastCrosshairTime  = null;
 let _crosshairHandler   = null;
@@ -1707,14 +1635,14 @@ function bindCrosshair(){
     // Formatters
     const fmt = v => (+v).toFixed(2);
     const fmtVol = v => {
-      if (!v) return 'â';
+      if (!v) return '—';
       if (v >= 1e8) return (v/1e6).toFixed(0)+'M';
       if (v >= 1e6) return (v/1e6).toFixed(2)+'M';
       if (v >= 1e3) return (v/1e3).toFixed(0)+'K';
       return String(v);
     };
     const fmtAmt = v => {
-      if (!v) return 'â';
+      if (!v) return '—';
       if (v >= 1e9)  return '$'+(v/1e9).toFixed(2)+'B';
       if (v >= 1e6)  return '$'+(v/1e6).toFixed(1)+'M';
       if (v >= 1e3)  return '$'+(v/1e3).toFixed(0)+'K';
@@ -1733,7 +1661,7 @@ function bindCrosshair(){
     const fullBar = barIdx >= 0 ? S.bars[barIdx] : null;
     const prevBar = barIdx > 0  ? S.bars[barIdx - 1] : null;
 
-    // æ¶¨è·å¹
+    // 涨跌幅
     const chgAmtEl = document.getElementById('ov-chgamt');
     const chgPctEl = document.getElementById('ov-chgpct');
     if (prevBar) {
@@ -1746,10 +1674,10 @@ function bindCrosshair(){
       chgPctEl.textContent = (up?'+':'')+chgPct.toFixed(2)+'%';
       chgPctEl.style.color = color;
     } else {
-      chgAmtEl.textContent = 'â'; chgPctEl.textContent = 'â';
+      chgAmtEl.textContent = '—'; chgPctEl.textContent = '—';
     }
 
-    // æäº¤é + éæ¯ + æäº¤é¢
+    // 成交量 + 量比 + 成交额
     if (fullBar) {
       const vol = fullBar.volume || 0;
       // 10-day avg vol
@@ -1761,12 +1689,12 @@ function bindCrosshair(){
       document.getElementById('ov-v').textContent = fmtVol(vol);
       document.getElementById('ov-amount').textContent = fmtAmt(bar.close * vol);
       const vEl = document.getElementById('ov-vratio');
-      vEl.textContent = vratio ? vratio.toFixed(2)+'x' : 'â';
+      vEl.textContent = vratio ? vratio.toFixed(2)+'x' : '—';
       vEl.style.color = vratio >= 1.73 ? 'var(--yellow)' : vratio > 0 ? 'var(--text)' : 'var(--t2)';
 
       // Volume sub-chart label
       if (volInfo) volInfo.textContent =
-        `â Vol: ${fmtVol(vol)}  Avg: ${fmtVol(Math.round(avgVol))}  Ratio: ${vratio?vratio.toFixed(2)+'x':'â'}`;
+        `│ Vol: ${fmtVol(vol)}  Avg: ${fmtVol(Math.round(avgVol))}  Ratio: ${vratio?vratio.toFixed(2)+'x':'—'}`;
 
       // Sync crosshair to sub-chart
       try {
@@ -1775,7 +1703,7 @@ function bindCrosshair(){
         }
       } catch{}
     } else {
-      ['ov-v','ov-amount','ov-vratio'].forEach(id=>set(id,'â'));
+      ['ov-v','ov-amount','ov-vratio'].forEach(id=>set(id,'—'));
       if (volInfo) volInfo.textContent = '';
     }
 
@@ -1793,9 +1721,9 @@ function bindCrosshair(){
   S.chart.subscribeCrosshairMove(_crosshairHandler);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // FEATURE 4: QUICK SYMBOL CHIPS  (Koyfin inspired)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 function quickLoad(sym){
   document.getElementById('sym-in').value = sym;
   // Highlight active chip
@@ -1805,9 +1733,9 @@ function quickLoad(sym){
   loadSymbol();
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // FEATURE 5: WATCHLIST  (TrendSpider Smart Watchlist inspired)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 let _watchlist = JSON.parse(localStorage.getItem('iai_watchlist') || '["AAPL","NVDA","SPY","QQQ"]');
 let _wlData    = {}; // sym -> { price, chg, sig }
 
@@ -1818,21 +1746,21 @@ function renderWatchlist(){
   const cnt  = document.getElementById('wl-count');
   if (!_watchlist.length){
     body.innerHTML = '<div class="wl-empty">Add symbols to track signals</div>';
-    cnt.textContent = 'â»';
+    cnt.textContent = '↻';
     return;
   }
-  cnt.textContent = _watchlist.length + ' â»';
+  cnt.textContent = _watchlist.length + ' ↻';
   body.innerHTML = _watchlist.map(sym => {
     const d   = _wlData[sym] || {};
-    const chg = d.chg != null ? (d.chg >= 0 ? '+' : '') + d.chg.toFixed(2) + '%' : 'â¦';
+    const chg = d.chg != null ? (d.chg >= 0 ? '+' : '') + d.chg.toFixed(2) + '%' : '…';
     const cls = d.chg != null ? (d.chg >= 0 ? 'up' : 'dn') : '';
-    const price = d.price != null ? '$' + d.price.toFixed(2) : 'â¦';
+    const price = d.price != null ? '$' + d.price.toFixed(2) : '…';
     return `<div class="wl-row" onclick="quickLoad('${sym}');updateWLActive('${sym}')">
       <span class="wl-sym">${sym}</span>
       <span class="wl-price">${price}</span>
       <span class="wl-chg ${cls}">${chg}</span>
       <span style="color:var(--t3);font-size:11px;cursor:pointer;margin-left:auto"
-        onclick="event.stopPropagation();removeFromWL('${sym}')">â</span>
+        onclick="event.stopPropagation();removeFromWL('${sym}')">✕</span>
     </div>`;
   }).join('');
 }
@@ -1857,12 +1785,12 @@ async function fetchWLItem(sym){
 }
 
 async function refreshWatchlist(){
-  document.getElementById('wl-count').textContent = 'â³';
+  document.getElementById('wl-count').textContent = '⟳';
   for(const sym of _watchlist){
     await fetchWLItem(sym);
     renderWatchlist();
   }
-  document.getElementById('wl-count').textContent = _watchlist.length + ' â»';
+  document.getElementById('wl-count').textContent = _watchlist.length + ' ↻';
 }
 
 function addToWatchlist(){
@@ -1883,9 +1811,9 @@ function removeFromWL(sym){
   renderWatchlist();
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // FEATURE 6: MOBILE NAV  (responsive panel switching)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 function mobPanel(p){
   const isMob = window.innerWidth <= 768;
   if (!isMob) return;
@@ -1901,17 +1829,17 @@ function mobPanel(p){
   document.querySelectorAll('.mob-nav-btn')[idx]?.classList.add('active');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // SCROLL TO SHOW LAST 100 BARS (free zoom after)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 function scrollToLast120(){
   const n=S.bars.length;
   try { S.chart.timeScale().setVisibleLogicalRange({from:Math.max(0,n-100),to:n+3}); } catch {}
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // DRAWING TOOLS
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 let _drawMode   = 'cursor';
 let _magnetMode = false;
 let _drawnLines = [];   // [{series, priceLine}]
@@ -1967,9 +1895,9 @@ function bindDrawingClick(){
   });
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 // USER PANEL & PREFERENCES
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════════
 function loadPrefs(){
   try { return JSON.parse(localStorage.getItem('iai_prefs') || '{}'); } catch { return {}; }
 }
@@ -2007,10 +1935,10 @@ function savePrefs(){
   toast(window.i18n.t('settingsSaved'), true, 2000);
 }
 
-// ââ EXPORT âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── EXPORT ───────────────────────────────────────────────────────
 function copyLink(){
   navigator.clipboard?.writeText(`${location.origin}${location.pathname}?symbol=${S.sym}&tf=${S.tf}`)
-    .then(()=>toast(window.i18n.t('copyLink')+' â',true,2000));
+    .then(()=>toast(window.i18n.t('copyLink')+' ✓',true,2000));
 }
 function exportCSV(){
   if(!S.signals.length){toast('No signals to export');return;}

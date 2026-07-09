@@ -1057,12 +1057,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       checkReturnFromStripe();
       // Pre-load PayPal SDK in background (non-blocking, 3s delay)
       setTimeout(()=>loadPayPalSDK().catch(()=>{}), 3000);
-      // Watchlist — delay 3s so it doesn't compete with main loadSymbol()
+      // Watchlist — fetch immediately, refresh every 5min
       renderWatchlist();
-      setTimeout(()=>{
-        refreshWatchlist();
-        setInterval(refreshWatchlist, 5 * 60 * 1000);
-      }, 3000);
+      refreshWatchlist().then(()=>setInterval(refreshWatchlist, 5*60*1000));
     });
   });
 });
@@ -1226,7 +1223,7 @@ async function loadSymbol(){
   try{
     if(!S.candles){await new Promise(r=>setTimeout(r,200));initCharts();}
     renderCandles(d);renderVolume();renderMarkers();
-    updateTopbar();updateLeft();
+    updateTopbar();updateLeft();showLastBar();
     scrollToLast120();
     document.getElementById('ct-tag').textContent=`${sym} · ${S.tf.toUpperCase()}`;
     showSignalBanner(S.signals, S.bars);
@@ -1289,7 +1286,7 @@ function updateLeft(){
   sigs.forEach(s=>{if(s.side==='B'&&!ob)ob=s;else if(s.side==='S'&&ob){trades.push(s.price-ob.price);ob=null;}});
   const wr=trades.length?Math.round(trades.filter(p=>p>0).length/trades.length*100):null;
   set('rc-w',wr!==null?`${wr}%  (${trades.length})`:'—');
-  const lastB=[...sigs].reverse().find(s=>s.side==='B');
+  const lastB=[...sigs].reverse().find(s=>s.side==='B'||s.side==='eB');
   if(lastB&&bars.length>14){
     const atr=calcATR(bars,14),e=+lastB.price;
     set('rc-e',`$${e.toFixed(2)}`);set('rc-s',`$${(e-atr*2).toFixed(2)}`);
@@ -1628,6 +1625,36 @@ function showSignalBanner(signals, bars){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// OHLCV LAST-BAR DEFAULT (pin to latest bar when not hovering)
+// ═══════════════════════════════════════════════════════════════
+function showLastBar(){
+  if(!S.bars.length) return;
+  const n=S.bars.length, bar=S.bars[n-1], prev=n>1?S.bars[n-2]:null;
+  const fmt=v=>(+v).toFixed(2);
+  const fmtVol=v=>{if(!v)return'—';if(v>=1e8)return(v/1e6).toFixed(0)+'M';if(v>=1e6)return(v/1e6).toFixed(2)+'M';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return String(v);};
+  const fmtAmt=v=>{if(!v)return'—';if(v>=1e9)return'$'+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(1)+'M';return'$'+v.toFixed(0);};
+  document.getElementById('ov-o').textContent=fmt(bar.open);
+  document.getElementById('ov-h').textContent=fmt(bar.high);
+  document.getElementById('ov-l').textContent=fmt(bar.low);
+  document.getElementById('ov-c').textContent=fmt(bar.close);
+  const chgAmtEl=document.getElementById('ov-chgamt'),chgPctEl=document.getElementById('ov-chgpct');
+  if(prev){
+    const ca=bar.close-prev.close,cp=ca/prev.close*100,col=ca>=0?'var(--bull)':'var(--bear)';
+    chgAmtEl.textContent=(ca>=0?'+':'')+ca.toFixed(2);chgAmtEl.style.color=col;
+    chgPctEl.textContent=(ca>=0?'+':'')+cp.toFixed(2)+'%';chgPctEl.style.color=col;
+  }
+  const vol=bar.volume||0,slice=S.bars.slice(Math.max(0,n-11),n-1);
+  const avg=slice.length?slice.reduce((a,b)=>a+(b.volume||0),0)/slice.length:0;
+  const vr=avg>0?vol/avg:0;
+  document.getElementById('ov-v').textContent=fmtVol(vol);
+  document.getElementById('ov-amount').textContent=fmtAmt(bar.close*vol);
+  const vEl=document.getElementById('ov-vratio');
+  vEl.textContent=vr?vr.toFixed(2)+'x':'—';
+  vEl.style.color=vr>=1.73?'var(--yellow)':vr>0?'var(--text)':'var(--t2)';
+  document.getElementById('ohlcv-row').classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════════════════
 // FEATURE 3: OHLCV CROSSHAIR ROW — extended + volume sync
 // ═══════════════════════════════════════════════════════════════
 let _lastCrosshairPrice = null;
@@ -1644,13 +1671,13 @@ function bindCrosshair(){
     const volInfo = document.getElementById('vol-crosshair-info');
 
     if (!param || !param.time || !param.seriesData) {
-      row.classList.remove('show');
+      showLastBar();
       if (volInfo) volInfo.textContent = '';
       try { S.subChart && S.subChart.clearCrosshairPosition && S.subChart.clearCrosshairPosition(); } catch{}
       return;
     }
     const bar = param.seriesData.get(S.candles);
-    if (!bar) { row.classList.remove('show'); return; }
+    if (!bar) { showLastBar(); return; }
 
     row.classList.add('show');
     _lastCrosshairPrice = bar.close;

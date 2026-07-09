@@ -1836,8 +1836,11 @@ async function fetchWLItem(sym){
 
 async function refreshWatchlist(){
   document.getElementById('wl-count').textContent = '⟳';
-  await Promise.all(_watchlist.map(sym => fetchWLItem(sym)));
-  renderWatchlist();
+  for(const sym of _watchlist){
+    await fetchWLItem(sym);
+    renderWatchlist();
+  }
+  document.getElementById('wl-count').textContent = _watchlist.length + ' ↻';
 }
 
 function addToWatchlist(){

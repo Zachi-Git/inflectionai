@@ -402,6 +402,23 @@ def plans():
     return {"plans": PLANS}
 
 
+# ── Lightweight price endpoint for watchlist ─────────────────────
+@app.get("/api/price")
+def price_endpoint(symbol: str = Query("AAPL")):
+    try:
+        t = yf.Ticker(symbol.upper())
+        hist = t.history(period="5d")
+        if hist.empty:
+            return {"price": None, "chg": None}
+        price = float(hist["Close"].iloc[-1])
+        chg = 0.0
+        if len(hist) >= 2:
+            prev = float(hist["Close"].iloc[-2])
+            chg = (price - prev) / prev * 100
+        return {"price": round(price, 2), "chg": round(chg, 2)}
+    except Exception:
+        return {"price": None, "chg": None}
+
 # ── Signal snapshot — with TTL cache (daily=6h, hourly=1h) ───────
 @app.get("/api/snapshot")
 def snapshot(

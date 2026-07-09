@@ -1828,7 +1828,7 @@ function updateWLActive(sym){
 async function fetchWLItem(sym){
   try {
     const r = await fetch(`${API}/api/snapshot?symbol=${sym}&tf=1d&limit=10`,
-      { signal: AbortSignal.timeout(8000) });
+      { signal: AbortSignal.timeout(25000) });
     if (!r.ok) return;
     const d = await r.json();
     const bars = d.bars || [];

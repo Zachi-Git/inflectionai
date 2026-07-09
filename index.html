@@ -728,7 +728,6 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <div class="sr"><span data-i18n="bullish">Bullish</span><b style="color:var(--yellow)" id="s-bull">—</b></div>
           <div class="sr"><span data-i18n="bearish">Bearish</span><b style="color:var(--pink)" id="s-bear">—</b></div>
           <div class="sr"><span data-i18n="neutral">Neutral</span><b id="s-neut">—</b></div>
-          <div class="sr"><span data-i18n="netFlow">Net Flow</span><b id="s-flow" style="color:var(--bull)">0</b></div>
         </div>
       </div>
       <div class="note" data-i18n="sentimentNote">Derived from signal history on loaded bars</div>
@@ -1805,15 +1804,12 @@ function renderWatchlist(){
     const d   = _wlData[sym] || {};
     const chg = d.chg != null ? (d.chg >= 0 ? '+' : '') + d.chg.toFixed(2) + '%' : '…';
     const cls = d.chg != null ? (d.chg >= 0 ? 'up' : 'dn') : '';
-    const sig = d.sig || '—';
-    const sigCls = ['B','eB','S','eS'].includes(sig) ? sig : 'none';
     const price = d.price != null ? '$' + d.price.toFixed(2) : '…';
     return `<div class="wl-row" onclick="quickLoad('${sym}');updateWLActive('${sym}')">
       <span class="wl-sym">${sym}</span>
       <span class="wl-price">${price}</span>
       <span class="wl-chg ${cls}">${chg}</span>
-      <span class="wl-sig ${sigCls}">${sig}</span>
-      <span style="color:var(--t3);font-size:11px;cursor:pointer;margin-left:6px"
+      <span style="color:var(--t3);font-size:11px;cursor:pointer;margin-left:auto"
         onclick="event.stopPropagation();removeFromWL('${sym}')">✕</span>
     </div>`;
   }).join('');
@@ -1827,22 +1823,12 @@ function updateWLActive(sym){
 
 async function fetchWLItem(sym){
   try {
-    const r = await fetch(`${API}/api/snapshot?symbol=${sym}&tf=1d&limit=10`,
+    const r = await fetch(`${API}/api/price?symbol=${sym}`,
       { signal: AbortSignal.timeout(25000) });
     if (!r.ok) return;
     const d = await r.json();
-    const bars = d.bars || [];
-    if (bars.length < 2) return;
-    const last = bars[bars.length-1], prev = bars[bars.length-2];
-    const chg  = (last.close - prev.close) / prev.close * 100;
-    const sigs = d.signals || [];
-    const lastSig = sigs.length ? sigs[sigs.length-1] : null;
-    const barsAgo = lastSig ? bars.filter(b => b.time >= lastSig.time).length - 1 : 99;
-    _wlData[sym] = {
-      price: last.close,
-      chg,
-      sig: (lastSig && barsAgo <= 3) ? lastSig.side : null,
-    };
+    if (d.price == null) return;
+    _wlData[sym] = { price: d.price, chg: d.chg };
   } catch { /* silent */ }
 }
 

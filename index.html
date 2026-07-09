@@ -1056,11 +1056,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       checkReturnFromStripe();
       // Pre-load PayPal SDK in background (non-blocking, 3s delay)
       setTimeout(()=>loadPayPalSDK().catch(()=>{}), 3000);
-      // Watchlist — fetch immediately, refresh every 5min
-      renderWatchlist();
-      refreshWatchlist().then(()=>setInterval(refreshWatchlist, 5*60*1000));
     });
   });
+  // Watchlist 不依赖 chart，直接在 DOMContentLoaded 运行
+  renderWatchlist();
+  refreshWatchlist().then(()=>setInterval(refreshWatchlist, 5*60*1000));
 });
 
 // ── LANGUAGE ─────────────────────────────────────────────────────

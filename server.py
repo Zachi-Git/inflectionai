@@ -406,18 +406,18 @@ def plans():
 @app.get("/api/price")
 def price_endpoint(symbol: str = Query("AAPL")):
     try:
-        t = yf.Ticker(symbol.upper())
-        hist = t.history(period="5d")
+        hist = yf.Ticker(symbol.upper()).history(period="5d", auto_adjust=True)
         if hist.empty:
             return {"price": None, "chg": None}
-        price = float(hist["Close"].iloc[-1])
+        hist.columns = [c.lower() for c in hist.columns]
+        price = float(hist["close"].iloc[-1])
         chg = 0.0
         if len(hist) >= 2:
-            prev = float(hist["Close"].iloc[-2])
+            prev = float(hist["close"].iloc[-2])
             chg = (price - prev) / prev * 100
         return {"price": round(price, 2), "chg": round(chg, 2)}
-    except Exception:
-        return {"price": None, "chg": None}
+    except Exception as e:
+        return {"price": None, "chg": None, "err": str(e)}
 
 # ── Signal snapshot — with TTL cache (daily=6h, hourly=1h) ───────
 @app.get("/api/snapshot")

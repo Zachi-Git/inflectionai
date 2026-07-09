@@ -90,14 +90,14 @@ header{height:var(--hh);display:flex;align-items:center;justify-content:space-be
 .gauge-num{font-size:22px;font-weight:700;line-height:1}
 .gauge-lbl{font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
 .sent-rows{flex:1}
-.sr{display:flex;justify-content:space-between;font-size:11px;
-  padding:2px 0;border-bottom:1px solid var(--bd);color:var(--t2)}
+.sr{display:flex;justify-content:space-between;font-size:12px;
+  padding:3px 0;border-bottom:1px solid var(--bd);color:var(--t2)}
 .sr:last-child{border:none}
 .sr b{font-weight:600}
 
 /* RC */
 .rc-row{display:flex;justify-content:space-between;align-items:center;
-  padding:5px 0;border-bottom:1px solid var(--bd);font-size:11px;color:var(--t2)}
+  padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px;color:var(--t2)}
 .rc-row:last-child{border:none}
 .rc-val{font-weight:600;color:var(--text)}
 .rc-val.g{color:var(--bull)}.rc-val.r{color:var(--bear)}.rc-val.w{color:var(--warn)}
@@ -734,33 +734,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
       <div class="note" data-i18n="sentimentNote">Derived from signal history on loaded bars</div>
     </div>
 
-    <div class="card">
-      <div class="card-t">
-        <span data-i18n="riskCopilot">Risk Copilot</span>
-        <span style="font-size:10px;color:var(--t2);font-weight:400" data-i18n="auto">Auto</span>
-      </div>
-      <div class="rc-row"><span data-i18n="entry">Entry</span><span class="rc-val w" id="rc-e">—</span></div>
-      <div class="rc-row"><span data-i18n="stopLoss">Stop (−2 ATR)</span><span class="rc-val p" id="rc-s">—</span></div>
-      <div class="rc-row"><span data-i18n="target1">Target 1 (+2 ATR)</span><span class="rc-val y" id="rc-t1">—</span></div>
-      <div class="rc-row"><span data-i18n="target2">Target 2 (+4 ATR)</span><span class="rc-val y" id="rc-t2">—</span></div>
-      <div class="rc-row"><span data-i18n="sigStrength">Strength</span><span class="rc-val" id="rc-c">—</span></div>
-      <div class="rc-row"><span data-i18n="backtestWR">Backtest WR</span><span class="rc-val y" id="rc-w">—</span></div>
-    </div>
-
-    <div class="card log-card">
-      <div class="card-t" data-i18n="recentSignals">Recent Signals</div>
-      <div id="log-mini"></div>
-    </div>
-
-    <!-- DISCLAIMER -->
-    <div class="card disclaimer-card">
-      <div class="disclaimer-head">⚠ Risk Disclosure</div>
-      <div class="disclaimer-body">
-        The signals and analysis on this platform are for <strong>informational purposes only</strong> and do not constitute financial, investment, or trading advice. Past performance is not indicative of future results. All trading involves substantial risk of loss. You should consult a qualified financial adviser before making any investment decisions. InflectionAI assumes no responsibility for any losses incurred as a result of using this platform.
-      </div>
-    </div>
-
-    <!-- Watchlist — TrendSpider Smart Watchlist inspired -->
+    <!-- Watchlist -->
     <div class="card">
       <div class="card-t">
         <span>Watchlist</span>
@@ -771,6 +745,26 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         <input type="text" class="wl-input" id="wl-in" placeholder="Add symbol…"
           onkeydown="if(event.key==='Enter')addToWatchlist()">
         <button class="wl-add-btn" onclick="addToWatchlist()">+ Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t">
+        <span data-i18n="riskCopilot">Risk Copilot</span>
+        <span style="font-size:10px;color:var(--t2);font-weight:400" data-i18n="auto">Auto</span>
+      </div>
+      <div class="rc-row"><span>Entry · 入场</span><span class="rc-val w" id="rc-e">—</span></div>
+      <div class="rc-row"><span>Stop · 止损</span><span class="rc-val p" id="rc-s">—</span></div>
+      <div class="rc-row"><span>Targets · 目标</span><span class="rc-val y" id="rc-t">—</span></div>
+      <div class="rc-row"><span>Confidence · 强度</span><span class="rc-val" id="rc-c">—</span></div>
+      <div class="rc-row"><span>Backtest WinRate · 回测胜率</span><span class="rc-val y" id="rc-w">—</span></div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="card disclaimer-card">
+      <div class="disclaimer-head">⚠ Risk Disclosure</div>
+      <div class="disclaimer-body">
+        The signals and analysis on this platform are for <strong>informational purposes only</strong> and do not constitute financial, investment, or trading advice. Past performance is not indicative of future results. All trading involves substantial risk of loss. You should consult a qualified financial adviser before making any investment decisions. InflectionAI assumes no responsibility for any losses incurred as a result of using this platform.
       </div>
     </div>
 
@@ -1226,13 +1220,13 @@ async function loadSymbol(){
   S.bars=d.bars||[];S.signals=d.signals||[];
   // ── 2. Update server status IMMEDIATELY after data received ────
   S.serverOk=true;
-  setSrv(true,`${sym} · ${S.bars.length} bars · ${S.signals.length} signals`);
+  setSrv(true);
   _clearRetry();
   // ── 3. Render (separate from network error handling) ────────────
   try{
     if(!S.candles){await new Promise(r=>setTimeout(r,200));initCharts();}
     renderCandles(d);renderVolume();renderMarkers();
-    renderMini();updateTopbar();updateLeft();
+    updateTopbar();updateLeft();
     scrollToLast120();
     document.getElementById('ct-tag').textContent=`${sym} · ${S.tf.toUpperCase()}`;
     showSignalBanner(S.signals, S.bars);
@@ -1288,7 +1282,8 @@ function updateLeft(){
   const nS=recent.filter(s=>['S','eS'].includes(s.side)).length;
   const tot=nB+nS||1;
   const pB=Math.round(nB/tot*100),pS=Math.round(nS/tot*100);
-  set('g-num',pB);set('s-bull',pB+'%');set('s-bear',pS+'%');
+  const net=pB-pS;
+  set('g-num',net);set('s-bull',pB+'%');set('s-bear',pS+'%');
   set('s-neut',Math.max(0,100-pB-pS)+'%');setGauge(pB);
   const trades=[];let ob=null;
   sigs.forEach(s=>{if(s.side==='B'&&!ob)ob=s;else if(s.side==='S'&&ob){trades.push(s.price-ob.price);ob=null;}});
@@ -1298,7 +1293,7 @@ function updateLeft(){
   if(lastB&&bars.length>14){
     const atr=calcATR(bars,14),e=+lastB.price;
     set('rc-e',`$${e.toFixed(2)}`);set('rc-s',`$${(e-atr*2).toFixed(2)}`);
-    set('rc-t1',`$${(e+atr*2).toFixed(2)}`);set('rc-t2',`$${(e+atr*4).toFixed(2)}`);
+    set('rc-t',`$${(e+atr*2).toFixed(2)} / $${(e+atr*4).toFixed(2)}`);
     set('rc-c',`${Math.round((+lastB.strength||0)*100)}%`);
   }
 }
@@ -1867,10 +1862,11 @@ function mobPanel(p){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SCROLL TO SHOW ALL BARS (fitContent)
+// SCROLL TO SHOW LAST 100 BARS (free zoom after)
 // ═══════════════════════════════════════════════════════════════
 function scrollToLast120(){
-  try { S.chart.timeScale().fitContent(); } catch {}
+  const n=S.bars.length;
+  try { S.chart.timeScale().setVisibleLogicalRange({from:Math.max(0,n-100),to:n+3}); } catch {}
 }
 
 // ═══════════════════════════════════════════════════════════════

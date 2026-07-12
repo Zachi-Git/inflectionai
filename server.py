@@ -481,7 +481,16 @@ async def create_checkout(request: Request):
     if plan not in PLANS:
         raise HTTPException(400, f"Unknown plan: {plan}. Valid: {list(PLANS.keys())}")
 
-    price_id = get_stripe_price(plan)
+    # Map plan → Stripe recurring interval (quarterly = 3 months)
+    _INTERVALS = {
+        "weekly":    ("week",  1),
+        "monthly":   ("month", 1),
+        "quarterly": ("month", 3),
+        "yearly":    ("year",  1),
+    }
+    stripe_interval, interval_count = _INTERVALS[plan]
+    amount_cents = PLANS[plan]["price_usd"]
+    plan_name    = PLANS[plan]["name"]
 
     # Create or retrieve Stripe customer
     customers = stripe.Customer.list(email=email, limit=1)
@@ -494,11 +503,22 @@ async def create_checkout(request: Request):
     # Create upsert user locally
     upsert_user(email)
 
-    # Create checkout session
+    # Create checkout session with inline pricing (no pre-created Price IDs needed)
     session = stripe.checkout.Session.create(
         customer=customer_id,
         payment_method_types=["card"],
-        line_items=[{"price": price_id, "quantity": 1}],
+        line_items=[{
+            "price_data": {
+                "currency": "usd",
+                "unit_amount": amount_cents,
+                "recurring": {
+                    "interval": stripe_interval,
+                    "interval_count": interval_count,
+                },
+                "product_data": {"name": f"InflectionAI {plan_name}"},
+            },
+            "quantity": 1,
+        }],
         mode="subscription",
         success_url=f"{FRONTEND_URL}/success.html?session_id={{CHECKOUT_SESSION_ID}}",
         cancel_url=f"{FRONTEND_URL}/?canceled=1",

@@ -2,22 +2,61 @@
   "version": 2,
   "name": "inflectionai",
   "builds": [
-    { "src": "index.html",      "use": "@vercel/static" },
-    { "src": "success.html",    "use": "@vercel/static" },
-    { "src": "translations.js", "use": "@vercel/static" }
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "success.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "translations.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "alipay_qr.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "wechat_qr.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "qr_data.js",
+      "use": "@vercel/static"
+    }
   ],
   "routes": [
-    { "src": "/",         "dest": "/index.html" },
-    { "src": "/success",  "dest": "/success.html" },
-    { "src": "/(.*)",     "dest": "/$1" }
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/success",
+      "dest": "/success.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options",        "value": "DENY" },
-        { "key": "Referrer-Policy",        "value": "strict-origin-when-cross-origin" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
       ]
     }
   ]

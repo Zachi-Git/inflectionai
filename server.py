@@ -1080,6 +1080,22 @@ async def admin_activate_usdt(request: Request,
     return {"activated": True, "email": email, "expires": expires}
 
 
+# ── QR Payment Submission ────────────────────────────────────────
+@app.post("/api/subscribe/qr-payment")
+async def submit_qr_payment(body: dict):
+    """Receive manual payment evidence for Alipay/WeChat QR payments."""
+    email = (body.get("email") or "").strip().lower()
+    plan  = (body.get("plan")  or "monthly").strip()
+    txid  = (body.get("txid")  or "").strip()
+    if not email or "@" not in email:
+        raise HTTPException(status_code=400, detail="Invalid email")
+    if not txid:
+        raise HTTPException(status_code=400, detail="Transaction ID required")
+    print(f"[QR-PAYMENT] email={email} plan={plan} txid={txid}", flush=True)
+    upsert_user(email)
+    return {"ok": True, "message": "Payment evidence received. Account will be activated within 24 hours."}
+
+
 # ── Run ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))

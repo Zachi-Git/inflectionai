@@ -1522,23 +1522,6 @@ async function submitQRPayment(){
     toast('提交失败：'+e.message);
   }
 }
-  const statusEl=document.getElementById('alipay-status');
-  const label = method==='alipay'?'Alipay':'WeChat Pay';
-  if(statusEl) statusEl.textContent=`Redirecting to ${label}…`;
-  try{
-    const r=await fetch(`${API}/api/subscribe/alipay-checkout`,{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email, plan:_selPlan, method}),
-    });
-    const d=await r.json();
-    if(d.detail||d.error) throw new Error(d.detail||d.error);
-    if(d.url) window.location.href=d.url;
-    else throw new Error('No checkout URL returned');
-  }catch(e){
-    if(statusEl) statusEl.textContent='';
-    toast(label+': '+e.message);
-  }
-}
 
 // ── Status check / Return URL handling ───────────────────────────
 async function checkMyStatus(){

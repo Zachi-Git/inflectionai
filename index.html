@@ -567,11 +567,11 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <button class="qr-tab" id="qr-tab-wechat" onclick="switchQR('wechat',this)">微信支付</button>
         </div>
         <div id="qr-block-alipay" class="qr-block">
-          <img src="/alipay_qr.png" alt="支付宝收款码" class="qr-img">
+          <img id="qr-img-alipay" src="" alt="支付宝收款码" class="qr-img">
           <p class="qr-name">Zac (&#x81E3;)</p>
         </div>
         <div id="qr-block-wechat" class="qr-block" style="display:none">
-          <img src="/wechat_qr.png" alt="微信收款码" class="qr-img">
+          <img id="qr-img-wechat" src="" alt="微信收款码" class="qr-img">
           <p class="qr-name">Zachiiii (&#x81E3;)</p>
         </div>
         <div class="qr-instructions">
@@ -1989,5 +1989,6 @@ function exportCSV(){
   a.download=`${S.sym}_${S.tf}_signals.csv`;a.click();
 }
 </script>
+<script src="/qr_data.js"></script>
 </body>
 </html>

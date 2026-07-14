@@ -728,10 +728,9 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <div class="sr"><span data-i18n="bullish">Bullish</span><b style="color:var(--yellow)" id="s-bull">—</b></div>
           <div class="sr"><span data-i18n="bearish">Bearish</span><b style="color:var(--pink)" id="s-bear">—</b></div>
           <div class="sr"><span data-i18n="neutral">Neutral</span><b id="s-neut">—</b></div>
-          <div class="sr"><span data-i18n="netFlow">Net Flow</span><b id="s-flow" style="color:var(--bull)">0</b></div>
         </div>
       </div>
-      <div class="note" data-i18n="sentimentNote">Derived from price momentum (last 20 bars)</div>
+      <div class="note" data-i18n="sentimentNote">Derived from signal history on loaded bars</div>
     </div>
 
     <div class="card">
@@ -739,12 +738,11 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         <span data-i18n="riskCopilot">Risk Copilot</span>
         <span style="font-size:10px;color:var(--t2);font-weight:400" data-i18n="auto">Auto</span>
       </div>
-      <div class="rc-row"><span data-i18n="entry">Entry</span><span class="rc-val w" id="rc-e">—</span></div>
-      <div class="rc-row"><span data-i18n="stopLoss">Stop (−1.5 ATR)</span><span class="rc-val p" id="rc-s">—</span></div>
-      <div class="rc-row"><span data-i18n="target1">Target 1 (+1R)</span><span class="rc-val y" id="rc-t1">—</span></div>
-      <div class="rc-row"><span data-i18n="target2">Target 2 (+2R)</span><span class="rc-val y" id="rc-t2">—</span></div>
-      <div class="rc-row"><span data-i18n="sigStrength">Confidence</span><span class="rc-val" id="rc-c">—</span></div>
-      <div class="rc-row"><span data-i18n="backtestWR">Backtest WR</span><span class="rc-val y" id="rc-w">—</span></div>
+      <div class="rc-row"><span>Entry · 入场</span><span class="rc-val w" id="rc-e">—</span></div>
+      <div class="rc-row"><span>Stop · 止损</span><span class="rc-val p" id="rc-s">—</span></div>
+      <div class="rc-row"><span>Targets · 目标</span><span class="rc-val y" id="rc-t">—</span></div>
+      <div class="rc-row"><span>Confidence · 强度</span><span class="rc-val" id="rc-c">—</span></div>
+      <div class="rc-row"><span>Backtest WinRate · 回测胜率</span><span class="rc-val y" id="rc-w">—</span></div>
     </div>
 
     <div class="card log-card">
@@ -1288,95 +1286,26 @@ function renderMarkers(){
 }
 
 // ── LEFT PANEL ───────────────────────────────────────────────────
-// Exact port of DarriusAI market.pulse.js (STABLE COMPAT) v2026.02.03
-const clampMP=(v,a,b)=>Math.max(a,Math.min(b,v));
-const pctMP=(x,d=0)=>Number.isFinite(x)?(x*100).toFixed(d)+'%':'—';
-// 1) Momentum + slope score (0..100) — DarriusAI derivePulseScore()
-function derivePulseScore(candles){
-  if(!candles||candles.length<30) return null;
-  const n=20;
-  const seg=candles.slice(-n);
-  const lastC=Number(candles[candles.length-1].close);
-  const prevC=Number(candles[candles.length-2].close);
-  const firstC=Number(seg[0].close);
-  if(!Number.isFinite(lastC)||!Number.isFinite(prevC)||!Number.isFinite(firstC)) return null;
-  const r1=(lastC-prevC)/(prevC||lastC);
-  const r20=(lastC-firstC)/(firstC||lastC);
-  // simple slope via linear regression on closes
-  let sx=0,sy=0,sxx=0,sxy=0;
-  for(let i=0;i<seg.length;i++){
-    const y=Number(seg[i].close);
-    if(!Number.isFinite(y)) continue;
-    sx+=i;sy+=y;sxx+=i*i;sxy+=i*y;
-  }
-  const denom=(n*sxx-sx*sx)||1;
-  const slope=(n*sxy-sx*sy)/denom;
-  const slopeN=slope/(lastC||1);
-  const raw=(slopeN*200)+(r20*80)+(r1*40);
-  return Math.round(clampMP(50+raw*3.5,0,100));
-}
-// 2) Percent split from score — DarriusAI scoreToSplit()
-function scoreToSplit(score){
-  if(!Number.isFinite(score)) return {bull:0.33,bear:0.33,neu:0.34};
-  const d=Math.abs(score-50);                       // 0..50, neutral peak at 50
-  const neu=clampMP(1-(d/50)*0.9,0.10,0.95);
-  const rest=1-neu;
-  let bull=rest*(score>=50?0.75:0.25);
-  let bear=rest-bull;
-  const s=bull+bear+neu;
-  bull/=s;bear/=s;
-  return {bull,bear,neu};
-}
 function updateLeft(){
-  const bars=S.bars;
-  // ── Market Pulse score (DarriusAI: 0..100, needs ≥30 bars) ───
-  const ds=derivePulseScore(bars);
-  const score=Number.isFinite(ds)?ds:50;
-  set('g-num',score);setGauge(score);
-  // ── Bullish/Bearish/Neutral: derived from score, NOT signals ─
-  const split=scoreToSplit(score);
-  set('s-bull',pctMP(split.bull,0));
-  set('s-bear',pctMP(split.bear,0));
-  set('s-neut',pctMP(split.neu,0));
-  // ── Net Inflow: up-bar vol − down-bar vol, last 20 bars ──────
-  let net=null;
-  if(bars&&bars.length>=5){
-    const seg20=bars.slice(-20);
-    let upV=0,dnV=0;
-    seg20.forEach(b=>{
-      const o=Number(b.open),c=Number(b.close),v=Number(b.volume??0);
-      if(!Number.isFinite(o)||!Number.isFinite(c)||!Number.isFinite(v))return;
-      if(c>=o)upV+=v;else dnV+=v;
-    });
-    net=upV-dnV;
-  }
-  const flowEl=document.getElementById('s-flow');
-  if(flowEl){
-    flowEl.textContent=Number.isFinite(net)?Math.round(net).toLocaleString():'—';
-    flowEl.style.color=(net??0)>=0?'var(--bull)':'var(--bear)';
-  }
-  // ── Risk Copilot (DarriusAI deriveRisk: needs ≥20 bars) ──────
-  if(bars&&bars.length>=20){
-    const atr=calcATR(bars,14);           // avg TR(14), same as DarriusAI
-    const e=bars[bars.length-1].close;    // Entry = latest close
-    const R=1.5*atr;                       // stop = entry − 1.5×ATR14, 1R = 1.5×ATR
-    set('rc-e',`$${e.toFixed(2)}`);
-    set('rc-s',`$${(e-R).toFixed(2)}`);
-    set('rc-t1',`$${(e+R).toFixed(2)}`);   // t1 = entry + 1.0R
-    set('rc-t2',`$${(e+R*2).toFixed(2)}`); // t2 = entry + 2.0R
-    // Confidence = up bars (close ≥ open) / last 20 bars (unrounded ratio)
-    const seg=bars.slice(-20);
-    let up=0,tot=0;
-    seg.forEach(b=>{
-      const o=Number(b.open),c=Number(b.close);
-      if(!Number.isFinite(o)||!Number.isFinite(c))return;
-      tot++;if(c>=o)up++;
-    });
-    const conf=tot?up/tot:NaN;
-    set('rc-c',pctMP(conf,0));
-    // WinRate = clamp(0.42 + confidence×0.25, 0.35, 0.75)
-    const wr=Number.isFinite(conf)?clampMP(0.42+conf*0.25,0.35,0.75):NaN;
-    set('rc-w',pctMP(wr,0));
+  const sigs=S.signals,bars=S.bars;
+  const recent=sigs.slice(-30);
+  const nB=recent.filter(s=>['B','eB'].includes(s.side)).length;
+  const nS=recent.filter(s=>['S','eS'].includes(s.side)).length;
+  const tot=nB+nS||1;
+  const pB=Math.round(nB/tot*100),pS=Math.round(nS/tot*100);
+  const net=pB-pS;
+  set('g-num',net);set('s-bull',pB+'%');set('s-bear',pS+'%');
+  set('s-neut',Math.max(0,100-pB-pS)+'%');setGauge(pB);
+  const trades=[];let ob=null;
+  sigs.forEach(s=>{if(s.side==='B'&&!ob)ob=s;else if(s.side==='S'&&ob){trades.push(s.price-ob.price);ob=null;}});
+  const wr=trades.length?Math.round(trades.filter(p=>p>0).length/trades.length*100):null;
+  set('rc-w',wr!==null?`${wr}%  (${trades.length})`:'—');
+  const lastB=[...sigs].reverse().find(s=>s.side==='B'||s.side==='eB');
+  if(lastB&&bars.length>14){
+    const atr=calcATR(bars,14),e=+lastB.price;
+    set('rc-e',`$${e.toFixed(2)}`);set('rc-s',`$${(e-atr*2).toFixed(2)}`);
+    set('rc-t',`$${(e+atr*2).toFixed(2)} / $${(e+atr*4).toFixed(2)}`);
+    set('rc-c',`${Math.round((+lastB.strength||0)*100)}%`);
   }
 }
 function renderMini(){

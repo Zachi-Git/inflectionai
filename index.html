@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>73times · Signal Hunter</title>
+<title>InflectionAI · Signal Hunter</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <script src="translations.js"></script>
 <style>
@@ -90,14 +90,14 @@ header{height:var(--hh);display:flex;align-items:center;justify-content:space-be
 .gauge-num{font-size:22px;font-weight:700;line-height:1}
 .gauge-lbl{font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
 .sent-rows{flex:1}
-.sr{display:flex;justify-content:space-between;font-size:12px;
-  padding:3px 0;border-bottom:1px solid var(--bd);color:var(--t2)}
+.sr{display:flex;justify-content:space-between;font-size:11px;
+  padding:2px 0;border-bottom:1px solid var(--bd);color:var(--t2)}
 .sr:last-child{border:none}
 .sr b{font-weight:600}
 
 /* RC */
 .rc-row{display:flex;justify-content:space-between;align-items:center;
-  padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px;color:var(--t2)}
+  padding:5px 0;border-bottom:1px solid var(--bd);font-size:11px;color:var(--t2)}
 .rc-row:last-child{border:none}
 .rc-val{font-weight:600;color:var(--text)}
 .rc-val.g{color:var(--bull)}.rc-val.r{color:var(--bear)}.rc-val.w{color:var(--warn)}
@@ -278,6 +278,17 @@ input::placeholder{color:var(--t3)}
 /* PayPal button container */
 #paypal-btn-container{min-height:40px}
 
+/* USDT panel */
+.usdt-addr-box{background:var(--card2);border:1px solid var(--bd2);
+  border-radius:var(--r);padding:10px 12px;margin-top:8px}
+.usdt-addr-lbl{font-size:9px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.usdt-addr{font-family:monospace;font-size:11px;color:var(--yellow);
+  word-break:break-all;margin-top:4px;line-height:1.5}
+.usdt-copy-btn{margin-top:8px;width:100%;padding:7px;border:1px solid var(--bd2);
+  border-radius:var(--r);background:transparent;color:var(--t2);font-size:11px;
+  font-weight:600;cursor:pointer;transition:all .15s}
+.usdt-copy-btn:hover{border-color:var(--yellow);color:var(--yellow)}
+.usdt-note{font-size:10px;color:var(--t3);margin-top:8px;line-height:1.5}
 
 /* Other methods (coming soon) */
 .other-methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px 24px 20px}
@@ -455,22 +466,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
   border-radius:var(--r);background:rgba(245,197,24,.08);color:var(--yellow);
   font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
 .ud-upgrade:hover{background:rgba(245,197,24,.18)}
-
-    /* QR Payment Panel */
-    .qr-pay-section { display:flex; flex-direction:column; align-items:center; gap:10px; padding:4px 0; }
-    .qr-tabs { display:flex; gap:6px; }
-    .qr-tab { padding:4px 16px; border:1px solid var(--border); border-radius:20px; background:transparent;
-               color:var(--t1); cursor:pointer; font-size:13px; transition:all .2s; }
-    .qr-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
-    .qr-block { display:flex; flex-direction:column; align-items:center; gap:4px; }
-    .qr-img { width:180px; height:180px; border-radius:8px; border:1px solid var(--border); object-fit:contain; }
-    .qr-name { font-size:12px; color:var(--t2); margin:0; }
-    .qr-instructions { text-align:center; font-size:12px; color:var(--t2); line-height:1.8; }
-    .qr-instructions strong { color:var(--t1); }
-    .qr-form { display:flex; flex-direction:column; gap:6px; width:100%; }
-    .qr-form input { padding:8px 10px; border-radius:6px; border:1px solid var(--border);
-                     background:var(--bg2); color:var(--t1); font-size:13px; width:100%; box-sizing:border-box; }
-  </style>
+</style>
 </head>
 <body>
 
@@ -519,6 +515,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     <!-- Payment tabs -->
     <div class="pay-tabs">
       <button class="pay-tab on"  onclick="setPayTab('paypal',this)">PayPal</button>
+      <button class="pay-tab"     onclick="setPayTab('usdt',this)">USDT</button>
       <button class="pay-tab"     onclick="setPayTab('card',this)">💳 Card</button>
       <button class="pay-tab"     onclick="setPayTab('alipay',this)">支付宝 / 微信</button>
     </div>
@@ -537,6 +534,39 @@ body.light #main-chart,body.light #sub-chart{filter:none}
       </div>
       <div id="paypal-status" style="font-size:11px;color:var(--t2);margin-top:6px"></div>
       <div class="pay-secure">🔒 Secure · Cancel anytime</div>
+    </div>
+
+    <!-- ── USDT panel ── -->
+    <div class="pay-panel" id="panel-usdt">
+      <div class="pay-email-row">
+        <div class="pay-email-lbl">Email</div>
+        <input type="email" id="sub-email-usdt" placeholder="your@email.com">
+      </div>
+      <button class="btn-primary" onclick="showUSDTWallet()">Get USDT Wallet Address</button>
+
+      <div id="usdt-result" style="display:none;margin-top:10px">
+        <!-- QR + address -->
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <img id="usdt-qr" src="" alt="QR" width="100" height="100"
+               style="border-radius:6px;border:1px solid var(--bd2);flex-shrink:0">
+          <div style="flex:1;min-width:0">
+            <div class="usdt-addr-lbl">Send exactly <strong id="usdt-amount-display" style="color:var(--yellow)">—</strong> USDT (TRC20)</div>
+            <div class="usdt-addr" id="usdt-addr" style="margin-top:4px;word-break:break-all">—</div>
+            <button class="usdt-copy-btn" onclick="copyUSDTAddr()" style="margin-top:6px">📋 Copy Address</button>
+          </div>
+        </div>
+        <div class="usdt-note" style="margin-top:8px">
+          ⚠ TRC20 network only. After sending, paste your TX hash below for verification.
+        </div>
+        <!-- TX hash submission -->
+        <div class="pay-email-row" style="margin-top:8px">
+          <div class="pay-email-lbl">TX Hash</div>
+          <input type="text" id="usdt-tx-input" placeholder="Paste your transaction hash…" style="font-family:monospace;font-size:11px">
+        </div>
+        <button class="btn-primary" onclick="submitUSDTTx()" style="margin-top:6px">✅ Submit TX for Verification</button>
+        <div id="usdt-submit-status" style="font-size:11px;margin-top:6px;color:var(--t2)"></div>
+      </div>
+      <div class="pay-secure" style="margin-top:10px">🔒 Verified within 24h · Email confirmation</div>
     </div>
 
     <!-- ── Card (Stripe) panel ── -->
@@ -560,33 +590,23 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     </div>
 
     <!-- ── Alipay / WeChat panel ── -->
-        <div class="pay-panel" id="panel-alipay">
-      <div class="qr-pay-section">
-        <div class="qr-tabs">
-          <button class="qr-tab active" id="qr-tab-alipay" onclick="switchQR('alipay',this)">支付宝</button>
-          <button class="qr-tab" id="qr-tab-wechat" onclick="switchQR('wechat',this)">微信支付</button>
-        </div>
-        <div id="qr-block-alipay" class="qr-block">
-          <img id="qr-img-alipay" src="" alt="支付宝收款码" class="qr-img">
-          <p class="qr-name">Zac (&#x81E3;)</p>
-        </div>
-        <div id="qr-block-wechat" class="qr-block" style="display:none">
-          <img id="qr-img-wechat" src="" alt="微信收款码" class="qr-img">
-          <p class="qr-name">Zachiiii (&#x81E3;)</p>
-        </div>
-        <div class="qr-instructions">
-          <p>① 扫码付款，备注您的<strong>邮箱地址</strong></p>
-          <p>② 填写下方信息提交凭证，24小时内激活账户</p>
-        </div>
-        <div class="qr-form">
-          <input type="email" id="qr-email" placeholder="您的邮箱 your@email.com">
-          <input type="text"  id="qr-plan-display" placeholder="订阅套餐" readonly style="opacity:0.6;cursor:default">
-          <input type="text"  id="qr-txid" placeholder="付款流水号 / 截图说明">
-          <button onclick="submitQRPayment()" class="btn-primary" style="margin-top:4px">提交付款凭证</button>
-        </div>
-        <div id="qr-status" style="font-size:11px;color:var(--t2);margin-top:6px;text-align:center"></div>
+    <div class="pay-panel" id="panel-alipay">
+      <div class="pay-email-row">
+        <div class="pay-email-lbl">Email</div>
+        <input type="email" id="sub-email-alipay" placeholder="your@email.com">
       </div>
-    </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+        <button class="btn-primary" onclick="startAlipayCheckout('alipay')"
+                style="background:linear-gradient(135deg,#1677FF,#006EFF)">
+          🔵 支付宝 Alipay
+        </button>
+        <button class="btn-primary" onclick="startAlipayCheckout('wechat_pay')"
+                style="background:linear-gradient(135deg,#07C160,#00A050)">
+          🟢 微信 WeChat Pay
+        </button>
+      </div>
+      <div class="pay-secure" style="margin-top:8px">🔒 Powered by Stripe · One-time payment</div>
+      <div id="alipay-status" style="font-size:11px;color:var(--t2);margin-top:4px"></div>
     </div>
 
   </div>
@@ -598,7 +618,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     <div class="logo">
       <div class="logo-mark">⚡</div>
       <div>
-        <div class="logo-name">73times</div>
+        <div class="logo-name">InflectionAI</div>
         <div class="logo-sub" data-i18n="appSub">AI Inflection Decision System</div>
       </div>
     </div>
@@ -628,7 +648,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
     <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
     <!-- User Button -->
     <div class="user-wrap" id="user-wrap">
-      <button class="user-btn" onclick="toggleUserPanel()" id="user-btn" title="Settings">
+      <button class="user-btn" onclick="toggleUserPanel()" id="user-btn" title="用户设置 · Settings">
         <svg viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="8" r="4"/>
           <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
@@ -644,7 +664,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           </div>
         </div>
         <div class="user-dd-sep"></div>
-        <div class="user-dd-section" data-i18n="preferences">Preferences</div>
+        <div class="user-dd-section">偏好设置 · Preferences</div>
         <div class="user-pref-row">
           <label>Default Symbol</label>
           <input type="text" id="pref-sym" value="TSLA" style="width:72px">
@@ -708,12 +728,39 @@ body.light #main-chart,body.light #sub-chart{filter:none}
           <div class="sr"><span data-i18n="bullish">Bullish</span><b style="color:var(--yellow)" id="s-bull">—</b></div>
           <div class="sr"><span data-i18n="bearish">Bearish</span><b style="color:var(--pink)" id="s-bear">—</b></div>
           <div class="sr"><span data-i18n="neutral">Neutral</span><b id="s-neut">—</b></div>
+          <div class="sr"><span data-i18n="netFlow">Net Flow</span><b id="s-flow" style="color:var(--bull)">0</b></div>
         </div>
       </div>
-      <div class="note" data-i18n="sentimentNote">Derived from signal history on loaded bars</div>
+      <div class="note" data-i18n="sentimentNote">Derived from price momentum (last 20 bars)</div>
     </div>
 
-    <!-- Watchlist -->
+    <div class="card">
+      <div class="card-t">
+        <span data-i18n="riskCopilot">Risk Copilot</span>
+        <span style="font-size:10px;color:var(--t2);font-weight:400" data-i18n="auto">Auto</span>
+      </div>
+      <div class="rc-row"><span data-i18n="entry">Entry</span><span class="rc-val w" id="rc-e">—</span></div>
+      <div class="rc-row"><span data-i18n="stopLoss">Stop (−1.5 ATR)</span><span class="rc-val p" id="rc-s">—</span></div>
+      <div class="rc-row"><span data-i18n="target1">Target 1 (+1R)</span><span class="rc-val y" id="rc-t1">—</span></div>
+      <div class="rc-row"><span data-i18n="target2">Target 2 (+2R)</span><span class="rc-val y" id="rc-t2">—</span></div>
+      <div class="rc-row"><span data-i18n="sigStrength">Confidence</span><span class="rc-val" id="rc-c">—</span></div>
+      <div class="rc-row"><span data-i18n="backtestWR">Backtest WR</span><span class="rc-val y" id="rc-w">—</span></div>
+    </div>
+
+    <div class="card log-card">
+      <div class="card-t" data-i18n="recentSignals">Recent Signals</div>
+      <div id="log-mini"></div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="card disclaimer-card">
+      <div class="disclaimer-head">⚠ Risk Disclosure</div>
+      <div class="disclaimer-body">
+        The signals and analysis on this platform are for <strong>informational purposes only</strong> and do not constitute financial, investment, or trading advice. Past performance is not indicative of future results. All trading involves substantial risk of loss. You should consult a qualified financial adviser before making any investment decisions. InflectionAI assumes no responsibility for any losses incurred as a result of using this platform.
+      </div>
+    </div>
+
+    <!-- Watchlist — TrendSpider Smart Watchlist inspired -->
     <div class="card">
       <div class="card-t">
         <span>Watchlist</span>
@@ -724,26 +771,6 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         <input type="text" class="wl-input" id="wl-in" placeholder="Add symbol…"
           onkeydown="if(event.key==='Enter')addToWatchlist()">
         <button class="wl-add-btn" onclick="addToWatchlist()">+ Add</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-t">
-        <span data-i18n="riskCopilot">Risk Copilot</span>
-        <span style="font-size:10px;color:var(--t2);font-weight:400" data-i18n="auto">Auto</span>
-      </div>
-      <div class="rc-row"><span>Entry · 入场</span><span class="rc-val w" id="rc-e">—</span></div>
-      <div class="rc-row"><span>Stop · 止损</span><span class="rc-val p" id="rc-s">—</span></div>
-      <div class="rc-row"><span>Targets · 目标</span><span class="rc-val y" id="rc-t">—</span></div>
-      <div class="rc-row"><span>Confidence · 强度</span><span class="rc-val" id="rc-c">—</span></div>
-      <div class="rc-row"><span>Backtest WinRate · 回测胜率</span><span class="rc-val y" id="rc-w">—</span></div>
-    </div>
-
-    <!-- DISCLAIMER -->
-    <div class="card disclaimer-card">
-      <div class="disclaimer-head">⚠ Risk Disclosure</div>
-      <div class="disclaimer-body">
-        The signals and analysis on this platform are for <strong>informational purposes only</strong> and do not constitute financial, investment, or trading advice. Past performance is not indicative of future results. All trading involves substantial risk of loss. You should consult a qualified financial adviser before making any investment decisions. InflectionAI assumes no responsibility for any losses incurred as a result of using this platform.
       </div>
     </div>
 
@@ -763,11 +790,11 @@ body.light #main-chart,body.light #sub-chart{filter:none}
       <div class="ohlcv-item">L <span id="ov-l">—</span></div>
       <div class="ohlcv-item">C <span id="ov-c">—</span></div>
       <div class="ohlcv-sep"></div>
-      <div class="ohlcv-item"><span data-i18n="chgLabel">Chg</span> <span id="ov-chgamt">—</span></div>
+      <div class="ohlcv-item">涨跌 <span id="ov-chgamt">—</span></div>
       <div class="ohlcv-item"><span id="ov-chgpct">—</span></div>
       <div class="ohlcv-sep"></div>
-      <div class="ohlcv-item"><span data-i18n="turnoverLabel">Turnover</span> <span id="ov-amount">—</span></div>
-      <div class="ohlcv-item"><span data-i18n="volRatioLabel">Vol Ratio</span> <span id="ov-vratio">—</span></div>
+      <div class="ohlcv-item">成交额 <span id="ov-amount">—</span></div>
+      <div class="ohlcv-item">量比 <span id="ov-vratio">—</span></div>
       <div class="ohlcv-item">Vol <span id="ov-v">—</span></div>
       <span class="ohlcv-sig" id="ov-sig" style="display:none"></span>
     </div>
@@ -776,17 +803,6 @@ body.light #main-chart,body.light #sub-chart{filter:none}
         <span class="sym-lbl" id="c-sym">—</span>
         <span class="price-n" id="c-price">—</span>
         <span class="price-c" id="c-chg"></span>
-      </div>
-      <!-- TF Row (时间周期) -->
-      <div class="tf-row">
-        <button class="tf-btn" data-tf="5m">5m</button>
-        <button class="tf-btn" data-tf="15m">15m</button>
-        <button class="tf-btn" data-tf="30m">30m</button>
-        <button class="tf-btn" data-tf="1h">1h</button>
-        <button class="tf-btn" data-tf="4h">4h</button>
-        <button class="tf-btn on" data-tf="1d">1D</button>
-        <button class="tf-btn" data-tf="1w">1W</button>
-        <button class="tf-btn" data-tf="1M">1M</button>
       </div>
       <!-- Drawing Toolbar (右上角) -->
       <div class="draw-toolbar" id="draw-toolbar">
@@ -867,27 +883,6 @@ body.light #main-chart,body.light #sub-chart{filter:none}
   <!-- ══ RIGHT ══ -->
   <div class="panel panel-r">
 
-    <!-- ── Data Source card ── -->
-    <div class="card">
-      <div class="card-t">
-        <span>Data Source · 数据源</span>
-        <span class="card-tag live">合规数据</span>
-      </div>
-      <div class="rc-row">
-        <span>Source · 来源</span>
-        <span class="rc-val" style="color:var(--t2);font-weight:500">第三方实盘</span>
-      </div>
-      <div style="margin-top:8px">
-        <select style="margin-bottom:8px">
-          <option>Twelve Pro</option>
-        </select>
-      </div>
-      <div class="note" style="margin-top:0">
-        <strong>Note:</strong> Twelve Pro market data. All data is legally licensed and proxied via backend.<br>
-        <strong>说明：</strong>使用 Twelve Data Pro 数据行情，合规展示。
-      </div>
-    </div>
-
     <div class="card">
       <div class="card-t" data-i18n="controlCenter">Control Center</div>
       <div class="lbl" data-i18n="symbolLabel">Symbol</div>
@@ -961,7 +956,8 @@ body.light #main-chart,body.light #sub-chart{filter:none}
       <!-- Payment logos -->
       <div class="pay-logos">
         <span title="PayPal" style="font-size:18px;cursor:default">🅿️</span>
-<span title="Visa" style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px">VISA</span>
+        <span title="USDT Crypto" style="font-size:18px;cursor:default">₮</span>
+        <span title="Visa" style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px">VISA</span>
         <span title="Mastercard" style="font-size:16px">💳</span>
         <span title="Alipay 支付宝" style="color:#1677FF;font-size:12px;font-weight:700">支付宝</span>
         <span title="WeChat Pay 微信" style="color:#07C160;font-size:12px;font-weight:700">微信</span>
@@ -983,7 +979,7 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 
     <div class="card">
       <div class="card-t" data-i18n="affiliate">Affiliate</div>
-      <button class="btn-outline" style="margin-top:0" data-i18n="affiliateCTA">Join Affiliate Program</button>
+      <button class="btn-outline" style="margin-top:0" onclick="window.location.href='mailto:affiliate@inflectionai.io?subject=Affiliate%20Program%20Application&body=Hi%2C%20I%27d%20like%20to%20join%20the%20InflectionAI%20affiliate%20program.'">Join Affiliate Program</button>
       <div class="note" data-i18n="affiliateNote">Earn commission on every referred subscriber.</div>
     </div>
 
@@ -1001,16 +997,16 @@ body.light #main-chart,body.light #sub-chart{filter:none}
 <footer>
   <span>support@inflectionai.io</span>
   <div style="display:flex;gap:10px">
-    <a href="#">inflectionai.io</a>
-    <a href="#">Terms</a>
-    <a href="#">Privacy</a>
+    <a href="https://inflectionai.io" target="_blank" rel="noopener">inflectionai.io</a>
+    <a href="/terms.html" target="_blank">Terms</a>
+    <a href="/privacy.html" target="_blank">Privacy</a>
   </div>
 </footer>
 
 <script>
 // ── API ──────────────────────────────────────────────────────────
 const API = (location.hostname==='localhost'||location.hostname==='127.0.0.1')
-  ? 'http://localhost:8000' : 'https://seven3times-api.onrender.com';
+  ? 'http://localhost:8000' : 'https://inflectionai-api.onrender.com';
 
 // ── STATE ────────────────────────────────────────────────────────
 const S = {
@@ -1067,11 +1063,14 @@ document.addEventListener('DOMContentLoaded',()=>{
       checkReturnFromStripe();
       // Pre-load PayPal SDK in background (non-blocking, 3s delay)
       setTimeout(()=>loadPayPalSDK().catch(()=>{}), 3000);
+      // Watchlist — delay 3s so it doesn't compete with main loadSymbol()
+      renderWatchlist();
+      setTimeout(()=>{
+        refreshWatchlist();
+        setInterval(refreshWatchlist, 5 * 60 * 1000);
+      }, 3000);
     });
   });
-  // Watchlist 不依赖 chart，直接在 DOMContentLoaded 运行
-  renderWatchlist();
-  refreshWatchlist().then(()=>setInterval(refreshWatchlist, 5*60*1000));
 });
 
 // ── LANGUAGE ─────────────────────────────────────────────────────
@@ -1092,12 +1091,16 @@ function changeLang(lang){
 }
 
 // ── SERVER CHECK ─────────────────────────────────────────────────
+let _coldStarting = false;
 async function checkServer(){
   try{
-    const r=await fetch(`${API}/api/health`,{signal:AbortSignal.timeout(4000)});
-    if(r.ok){setSrv(true);S.serverOk=true;_clearRetry();}else throw 0;
+    const r=await fetch(`${API}/api/health`,{signal:AbortSignal.timeout(6000)});
+    if(r.ok){setSrv(true);S.serverOk=true;_clearRetry();_coldStarting=false;}else throw 0;
   }catch{
-    setSrv(false);S.serverOk=false;
+    // First failure = likely cold start (Render free tier spins down after 15min idle)
+    // Show a warm "warming up" message instead of scary "offline"
+    _coldStarting=true;
+    setSrv(false,'服务器启动中，请稍候 (~10s)…');
     _scheduleRetry();
   }
 }
@@ -1107,19 +1110,25 @@ function _scheduleRetry(){
   let attempt=0;
   _retryTimer=setInterval(async()=>{
     attempt++;
+    if(_coldStarting && attempt<=6){
+      // Show countdown during cold start
+      const secs=(6-attempt)*3;
+      document.getElementById('srv-txt').textContent=`服务器启动中…约${secs>0?secs:3}秒`;
+    }
     try{
-      const r=await fetch(`${API}/api/health`,{signal:AbortSignal.timeout(3000)});
+      const r=await fetch(`${API}/api/health`,{signal:AbortSignal.timeout(4000)});
       if(r.ok){
-        S.serverOk=true;setSrv(true);_clearRetry();
+        S.serverOk=true;_coldStarting=false;setSrv(true);_clearRetry();
         loadSymbol();               // auto-load on reconnect
       }
     }catch{}
-    if(attempt>=20) _clearRetry(); // give up after ~60s
+    if(attempt>=20) {_clearRetry();setSrv(false);} // give up after ~60s
   },3000);
 }
 function _clearRetry(){if(_retryTimer){clearInterval(_retryTimer);_retryTimer=null;}}
 function setSrv(ok,customMsg){
-  document.getElementById('srv-dot').className='dot '+(ok?'ok':'err');
+  document.getElementById('srv-dot').className='dot '+(ok?'ok':'spin');
+  if(ok) document.getElementById('srv-dot').className='dot ok';
   document.getElementById('srv-txt').textContent = customMsg || window.i18n.t(ok?'srvOnline':'srvOffline');
 }
 
@@ -1212,13 +1221,13 @@ async function loadSymbol(){
       if(!S.serverOk){toast('⚠ '+window.i18n.t('srvOffline'));return;}
       const r=await fetch(`${API}/api/snapshot?symbol=${sym}&tf=${S.tf}&limit=${getLimitForTF(S.tf)}`,
         {signal:AbortSignal.timeout(30000)});
-      if(r.status===422){const e=await r.json().catch(()=>({}));throw Object.assign(new Error(`${window.i18n.t('invalidSym')} 「${sym}」— ${e.detail||'not found'}`),{isInvalid:true});}
+      if(r.status===422){const e=await r.json().catch(()=>({}));throw new Error(`无效代码「${sym}」— ${e.detail||'not found'}`);}
       if(!r.ok) throw new Error(`HTTP ${r.status}`);
       d=await r.json();
       _tfCache[cacheKey]=d;  // store in cache
     }catch(e){
       // Network/server error only
-      toast(e.isInvalid?e.message:'⚠ '+window.i18n.t('srvOffline')+'\n('+e.message+')');
+      toast(e.message.includes('无效')?e.message:'⚠ '+window.i18n.t('srvOffline')+'\n('+e.message+')');
       setSrv(false);S.serverOk=false;
       showOv(false); return;
     }
@@ -1227,13 +1236,13 @@ async function loadSymbol(){
   S.bars=d.bars||[];S.signals=d.signals||[];
   // ── 2. Update server status IMMEDIATELY after data received ────
   S.serverOk=true;
-  setSrv(true);
+  setSrv(true,`${sym} · ${S.bars.length} bars · ${S.signals.length} signals`);
   _clearRetry();
   // ── 3. Render (separate from network error handling) ────────────
   try{
     if(!S.candles){await new Promise(r=>setTimeout(r,200));initCharts();}
     renderCandles(d);renderVolume();renderMarkers();
-    updateTopbar();updateLeft();showLastBar();
+    renderMini();updateTopbar();updateLeft();
     scrollToLast120();
     document.getElementById('ct-tag').textContent=`${sym} · ${S.tf.toUpperCase()}`;
     showSignalBanner(S.signals, S.bars);
@@ -1263,47 +1272,111 @@ function renderVolume(){
 }
 function renderMarkers(){
   if(!S.candles) return;
-  let _lastDir=null;
   const markers=(S.signals||[])
     .filter(s=>{
-      if(s.side==='eB'){if(!S.showEB||_lastDir==='UP')return false;_lastDir='UP';return true;}
-      if(s.side==='eS'){if(!S.showEB||_lastDir==='DOWN')return false;_lastDir='DOWN';return true;}
-      if(s.side==='B'){if(!S.showB)return false;_lastDir='UP';return true;}
-      if(s.side==='S'){if(!S.showB)return false;_lastDir='DOWN';return true;}
+      if(['eB','eS'].includes(s.side)&&!S.showEB) return false;
+      if(['B','S'].includes(s.side)&&!S.showB) return false;
       return true;
     })
     .map(s=>{
       const bull=['B','eB'].includes(s.side),conf=s.side==='B'||s.side==='S';
-      // B/S confirmed signals: circle shape (larger, distinct); eB/eS early: arrow
-      const shape = s.side==='B'?'circle':s.side==='S'?'circle':bull?'arrowUp':'arrowDown';
       return{time:s.time,position:bull?'belowBar':'aboveBar',
-        color:bull?YELLOW:PINK,shape,
+        color:bull?YELLOW:PINK,shape:bull?'arrowUp':'arrowDown',
         text:s.side,size:conf?2:1};
     }).sort((a,b)=>a.time-b.time);
   S.candles.setMarkers(markers);
 }
 
 // ── LEFT PANEL ───────────────────────────────────────────────────
+// Exact port of DarriusAI market.pulse.js (STABLE COMPAT) v2026.02.03
+const clampMP=(v,a,b)=>Math.max(a,Math.min(b,v));
+const pctMP=(x,d=0)=>Number.isFinite(x)?(x*100).toFixed(d)+'%':'—';
+// 1) Momentum + slope score (0..100) — DarriusAI derivePulseScore()
+function derivePulseScore(candles){
+  if(!candles||candles.length<30) return null;
+  const n=20;
+  const seg=candles.slice(-n);
+  const lastC=Number(candles[candles.length-1].close);
+  const prevC=Number(candles[candles.length-2].close);
+  const firstC=Number(seg[0].close);
+  if(!Number.isFinite(lastC)||!Number.isFinite(prevC)||!Number.isFinite(firstC)) return null;
+  const r1=(lastC-prevC)/(prevC||lastC);
+  const r20=(lastC-firstC)/(firstC||lastC);
+  // simple slope via linear regression on closes
+  let sx=0,sy=0,sxx=0,sxy=0;
+  for(let i=0;i<seg.length;i++){
+    const y=Number(seg[i].close);
+    if(!Number.isFinite(y)) continue;
+    sx+=i;sy+=y;sxx+=i*i;sxy+=i*y;
+  }
+  const denom=(n*sxx-sx*sx)||1;
+  const slope=(n*sxy-sx*sy)/denom;
+  const slopeN=slope/(lastC||1);
+  const raw=(slopeN*200)+(r20*80)+(r1*40);
+  return Math.round(clampMP(50+raw*3.5,0,100));
+}
+// 2) Percent split from score — DarriusAI scoreToSplit()
+function scoreToSplit(score){
+  if(!Number.isFinite(score)) return {bull:0.33,bear:0.33,neu:0.34};
+  const d=Math.abs(score-50);                       // 0..50, neutral peak at 50
+  const neu=clampMP(1-(d/50)*0.9,0.10,0.95);
+  const rest=1-neu;
+  let bull=rest*(score>=50?0.75:0.25);
+  let bear=rest-bull;
+  const s=bull+bear+neu;
+  bull/=s;bear/=s;
+  return {bull,bear,neu};
+}
 function updateLeft(){
-  const sigs=S.signals,bars=S.bars;
-  const recent=sigs.slice(-30);
-  const nB=recent.filter(s=>['B','eB'].includes(s.side)).length;
-  const nS=recent.filter(s=>['S','eS'].includes(s.side)).length;
-  const tot=nB+nS||1;
-  const pB=Math.round(nB/tot*100),pS=Math.round(nS/tot*100);
-  const net=pB-pS;
-  set('g-num',net);set('s-bull',pB+'%');set('s-bear',pS+'%');
-  set('s-neut',Math.max(0,100-pB-pS)+'%');setGauge(pB);
-  const trades=[];let ob=null;
-  sigs.forEach(s=>{if(s.side==='B'&&!ob)ob=s;else if(s.side==='S'&&ob){trades.push(s.price-ob.price);ob=null;}});
-  const wr=trades.length?Math.round(trades.filter(p=>p>0).length/trades.length*100):null;
-  set('rc-w',wr!==null?`${wr}%  (${trades.length})`:'—');
-  const lastB=[...sigs].reverse().find(s=>s.side==='B'||s.side==='eB');
-  if(lastB&&bars.length>14){
-    const atr=calcATR(bars,14),e=+lastB.price;
-    set('rc-e',`$${e.toFixed(2)}`);set('rc-s',`$${(e-atr*2).toFixed(2)}`);
-    set('rc-t',`$${(e+atr*2).toFixed(2)} / $${(e+atr*4).toFixed(2)}`);
-    set('rc-c',`${Math.round((+lastB.strength||0)*100)}%`);
+  const bars=S.bars;
+  // ── Market Pulse score (DarriusAI: 0..100, needs ≥30 bars) ───
+  const ds=derivePulseScore(bars);
+  const score=Number.isFinite(ds)?ds:50;
+  set('g-num',score);setGauge(score);
+  // ── Bullish/Bearish/Neutral: derived from score, NOT signals ─
+  const split=scoreToSplit(score);
+  set('s-bull',pctMP(split.bull,0));
+  set('s-bear',pctMP(split.bear,0));
+  set('s-neut',pctMP(split.neu,0));
+  // ── Net Inflow: up-bar vol − down-bar vol, last 20 bars ──────
+  let net=null;
+  if(bars&&bars.length>=5){
+    const seg20=bars.slice(-20);
+    let upV=0,dnV=0;
+    seg20.forEach(b=>{
+      const o=Number(b.open),c=Number(b.close),v=Number(b.volume??0);
+      if(!Number.isFinite(o)||!Number.isFinite(c)||!Number.isFinite(v))return;
+      if(c>=o)upV+=v;else dnV+=v;
+    });
+    net=upV-dnV;
+  }
+  const flowEl=document.getElementById('s-flow');
+  if(flowEl){
+    flowEl.textContent=Number.isFinite(net)?Math.round(net).toLocaleString():'—';
+    flowEl.style.color=(net??0)>=0?'var(--bull)':'var(--bear)';
+  }
+  // ── Risk Copilot (DarriusAI deriveRisk: needs ≥20 bars) ──────
+  if(bars&&bars.length>=20){
+    const atr=calcATR(bars,14);           // avg TR(14), same as DarriusAI
+    const e=bars[bars.length-1].close;    // Entry = latest close
+    const R=1.5*atr;                       // stop = entry − 1.5×ATR14, 1R = 1.5×ATR
+    set('rc-e',`$${e.toFixed(2)}`);
+    set('rc-s',`$${(e-R).toFixed(2)}`);
+    set('rc-t1',`$${(e+R).toFixed(2)}`);   // t1 = entry + 1.0R
+    set('rc-t2',`$${(e+R*2).toFixed(2)}`); // t2 = entry + 2.0R
+    // Confidence = up bars (close ≥ open) / last 20 bars (unrounded ratio)
+    const seg=bars.slice(-20);
+    let up=0,tot=0;
+    seg.forEach(b=>{
+      const o=Number(b.open),c=Number(b.close);
+      if(!Number.isFinite(o)||!Number.isFinite(c))return;
+      tot++;if(c>=o)up++;
+    });
+    const conf=tot?up/tot:NaN;
+    set('rc-c',pctMP(conf,0));
+    // WinRate = clamp(0.42 + confidence×0.25, 0.35, 0.75)
+    const wr=Number.isFinite(conf)?clampMP(0.42+conf*0.25,0.35,0.75):NaN;
+    set('rc-w',pctMP(wr,0));
   }
 }
 function renderMini(){
@@ -1468,6 +1541,44 @@ function _renderPayPalBtn(){
   }).render('#paypal-btn-container');
 }
 
+// ── USDT Manual Wallet ────────────────────────────────────────────
+async function showUSDTWallet(){
+  const email=document.getElementById('sub-email-usdt').value.trim();
+  if(!email||!email.includes('@')){ toast('Enter a valid email first'); return; }
+  try{
+    const r=await fetch(`${API}/api/usdt/wallet?plan=${_selPlan}&email=${encodeURIComponent(email)}`);
+    const d=await r.json();
+    if(d.detail) throw new Error(d.detail);
+    document.getElementById('usdt-addr').textContent = d.address;
+    document.getElementById('usdt-amount-display').textContent = d.amount;
+    // QR code via free public API (loaded by user's browser, not server)
+    document.getElementById('usdt-qr').src =
+      `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(d.address)}`;
+    document.getElementById('usdt-result').style.display='block';
+  }catch(e){ toast('USDT: '+e.message); }
+}
+
+function copyUSDTAddr(){
+  const addr=document.getElementById('usdt-addr').textContent;
+  navigator.clipboard?.writeText(addr).then(()=>toast('Address copied!',true,2000));
+}
+
+async function submitUSDTTx(){
+  const email=document.getElementById('sub-email-usdt').value.trim();
+  const txHash=document.getElementById('usdt-tx-input').value.trim();
+  const statusEl=document.getElementById('usdt-submit-status');
+  if(!txHash){ toast('Paste your TX hash first'); return; }
+  try{
+    const r=await fetch(`${API}/api/usdt/submit`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email, plan:_selPlan, tx_hash:txHash}),
+    });
+    const d=await r.json();
+    if(statusEl) statusEl.textContent = '✅ '+d.message;
+    toast('TX submitted! We\'ll email you upon activation.', true, 5000);
+  }catch(e){ toast('Submit error: '+e.message); }
+}
+
 // ── Stripe Card Checkout ──────────────────────────────────────────
 async function startStripeCheckout(){
   const email=document.getElementById('sub-email-card').value.trim();
@@ -1490,36 +1601,24 @@ async function startStripeCheckout(){
 }
 
 // ── Alipay / WeChat Pay (via Stripe) ─────────────────────────────
-function switchQR(type, el){
-  document.getElementById('qr-block-alipay').style.display = type==='alipay' ? '' : 'none';
-  document.getElementById('qr-block-wechat').style.display = type==='wechat' ? '' : 'none';
-  document.querySelectorAll('.qr-tab').forEach(t=>t.classList.remove('active'));
-  if(el) el.classList.add('active');
-}
-
-async function submitQRPayment(){
-  const email   = (document.getElementById('qr-email')?.value||'').trim();
-  const plan    = _selPlan || 'monthly';
-  const txid    = (document.getElementById('qr-txid')?.value||'').trim();
-  const statusEl= document.getElementById('qr-status');
-  if(!email||!email.includes('@')){ toast('请填写有效邮箱'); return; }
-  if(!txid){ toast('请填写付款流水号或说明'); return; }
-  if(statusEl) statusEl.textContent='提交中…';
+async function startAlipayCheckout(method){
+  const email=document.getElementById('sub-email-alipay').value.trim();
+  if(!email||!email.includes('@')){ toast('Enter a valid email first'); return; }
+  const statusEl=document.getElementById('alipay-status');
+  const label = method==='alipay'?'Alipay':'WeChat Pay';
+  if(statusEl) statusEl.textContent=`Redirecting to ${label}…`;
   try{
-    const r=await fetch(`${API}/api/subscribe/qr-payment`,{
+    const r=await fetch(`${API}/api/subscribe/alipay-checkout`,{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email, plan, txid}),
+      body:JSON.stringify({email, plan:_selPlan, method}),
     });
     const d=await r.json();
-    if(d.ok){
-      toast('✅ 凭证已提交，24小时内激活');
-      if(statusEl) statusEl.textContent='✅ 已收到，我们会尽快处理';
-    } else {
-      throw new Error(d.detail||d.error||'提交失败');
-    }
+    if(d.detail||d.error) throw new Error(d.detail||d.error);
+    if(d.url) window.location.href=d.url;
+    else throw new Error('No checkout URL returned');
   }catch(e){
     if(statusEl) statusEl.textContent='';
-    toast('提交失败：'+e.message);
+    toast(label+': '+e.message);
   }
 }
 
@@ -1611,36 +1710,6 @@ function showSignalBanner(signals, bars){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// OHLCV LAST-BAR DEFAULT (pin to latest bar when not hovering)
-// ═══════════════════════════════════════════════════════════════
-function showLastBar(){
-  if(!S.bars.length) return;
-  const n=S.bars.length, bar=S.bars[n-1], prev=n>1?S.bars[n-2]:null;
-  const fmt=v=>(+v).toFixed(2);
-  const fmtVol=v=>{if(!v)return'—';if(v>=1e8)return(v/1e6).toFixed(0)+'M';if(v>=1e6)return(v/1e6).toFixed(2)+'M';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return String(v);};
-  const fmtAmt=v=>{if(!v)return'—';if(v>=1e9)return'$'+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(1)+'M';return'$'+v.toFixed(0);};
-  document.getElementById('ov-o').textContent=fmt(bar.open);
-  document.getElementById('ov-h').textContent=fmt(bar.high);
-  document.getElementById('ov-l').textContent=fmt(bar.low);
-  document.getElementById('ov-c').textContent=fmt(bar.close);
-  const chgAmtEl=document.getElementById('ov-chgamt'),chgPctEl=document.getElementById('ov-chgpct');
-  if(prev){
-    const ca=bar.close-prev.close,cp=ca/prev.close*100,col=ca>=0?'var(--bull)':'var(--bear)';
-    chgAmtEl.textContent=(ca>=0?'+':'')+ca.toFixed(2);chgAmtEl.style.color=col;
-    chgPctEl.textContent=(ca>=0?'+':'')+cp.toFixed(2)+'%';chgPctEl.style.color=col;
-  }
-  const vol=bar.volume||0,slice=S.bars.slice(Math.max(0,n-11),n-1);
-  const avg=slice.length?slice.reduce((a,b)=>a+(b.volume||0),0)/slice.length:0;
-  const vr=avg>0?vol/avg:0;
-  document.getElementById('ov-v').textContent=fmtVol(vol);
-  document.getElementById('ov-amount').textContent=fmtAmt(bar.close*vol);
-  const vEl=document.getElementById('ov-vratio');
-  vEl.textContent=vr?vr.toFixed(2)+'x':'—';
-  vEl.style.color=vr>=1.73?'var(--yellow)':vr>0?'var(--text)':'var(--t2)';
-  document.getElementById('ohlcv-row').classList.add('show');
-}
-
-// ═══════════════════════════════════════════════════════════════
 // FEATURE 3: OHLCV CROSSHAIR ROW — extended + volume sync
 // ═══════════════════════════════════════════════════════════════
 let _lastCrosshairPrice = null;
@@ -1657,13 +1726,13 @@ function bindCrosshair(){
     const volInfo = document.getElementById('vol-crosshair-info');
 
     if (!param || !param.time || !param.seriesData) {
-      showLastBar();
+      row.classList.remove('show');
       if (volInfo) volInfo.textContent = '';
       try { S.subChart && S.subChart.clearCrosshairPosition && S.subChart.clearCrosshairPosition(); } catch{}
       return;
     }
     const bar = param.seriesData.get(S.candles);
-    if (!bar) { showLastBar(); return; }
+    if (!bar) { row.classList.remove('show'); return; }
 
     row.classList.add('show');
     _lastCrosshairPrice = bar.close;
@@ -1791,12 +1860,15 @@ function renderWatchlist(){
     const d   = _wlData[sym] || {};
     const chg = d.chg != null ? (d.chg >= 0 ? '+' : '') + d.chg.toFixed(2) + '%' : '…';
     const cls = d.chg != null ? (d.chg >= 0 ? 'up' : 'dn') : '';
+    const sig = d.sig || '—';
+    const sigCls = ['B','eB','S','eS'].includes(sig) ? sig : 'none';
     const price = d.price != null ? '$' + d.price.toFixed(2) : '…';
     return `<div class="wl-row" onclick="quickLoad('${sym}');updateWLActive('${sym}')">
       <span class="wl-sym">${sym}</span>
       <span class="wl-price">${price}</span>
       <span class="wl-chg ${cls}">${chg}</span>
-      <span style="color:var(--t3);font-size:11px;cursor:pointer;margin-left:auto"
+      <span class="wl-sig ${sigCls}">${sig}</span>
+      <span style="color:var(--t3);font-size:11px;cursor:pointer;margin-left:6px"
         onclick="event.stopPropagation();removeFromWL('${sym}')">✕</span>
     </div>`;
   }).join('');
@@ -1810,24 +1882,29 @@ function updateWLActive(sym){
 
 async function fetchWLItem(sym){
   try {
-    const r = await fetch(`${API}/api/snapshot?symbol=${sym}&tf=1d&limit=30`,
-      { signal: AbortSignal.timeout(25000) });
+    const r = await fetch(`${API}/api/snapshot?symbol=${sym}&tf=1d&limit=10`,
+      { signal: AbortSignal.timeout(8000) });
     if (!r.ok) return;
     const d = await r.json();
     const bars = d.bars || [];
     if (bars.length < 2) return;
     const last = bars[bars.length-1], prev = bars[bars.length-2];
-    _wlData[sym] = { price: last.close, chg: (last.close-prev.close)/prev.close*100 };
+    const chg  = (last.close - prev.close) / prev.close * 100;
+    const sigs = d.signals || [];
+    const lastSig = sigs.length ? sigs[sigs.length-1] : null;
+    const barsAgo = lastSig ? bars.filter(b => b.time >= lastSig.time).length - 1 : 99;
+    _wlData[sym] = {
+      price: last.close,
+      chg,
+      sig: (lastSig && barsAgo <= 3) ? lastSig.side : null,
+    };
   } catch { /* silent */ }
 }
 
 async function refreshWatchlist(){
   document.getElementById('wl-count').textContent = '⟳';
-  for(const sym of _watchlist){
-    await fetchWLItem(sym);
-    renderWatchlist();
-  }
-  document.getElementById('wl-count').textContent = _watchlist.length + ' ↻';
+  await Promise.all(_watchlist.map(sym => fetchWLItem(sym)));
+  renderWatchlist();
 }
 
 function addToWatchlist(){
@@ -1867,11 +1944,18 @@ function mobPanel(p){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SCROLL TO SHOW LAST 100 BARS (free zoom after)
+// SCROLL TO LAST N BARS (default 120)
 // ═══════════════════════════════════════════════════════════════
 function scrollToLast120(){
-  const n=S.bars.length;
-  try { S.chart.timeScale().setVisibleLogicalRange({from:Math.max(0,n-100),to:n+3}); } catch {}
+  if (!S.bars || !S.bars.length){ S.chart.timeScale().fitContent(); return; }
+  const prefs = loadPrefs();
+  const n = Math.min(prefs.bars || 120, S.bars.length);
+  try {
+    S.chart.timeScale().setVisibleRange({
+      from: S.bars[S.bars.length - n].time,
+      to:   S.bars[S.bars.length - 1].time,
+    });
+  } catch { S.chart.timeScale().fitContent(); }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1889,17 +1973,17 @@ function setDrawMode(mode){
   document.getElementById('main-chart').style.cursor =
     mode === 'cursor' ? '' : 'crosshair';
   if (mode !== 'cursor')
-    toast({ hline:window.i18n.t('hlineMode'), tline:window.i18n.t('tlineMode'), rect:window.i18n.t('rectMode') }[mode] || mode, mode==='hline', 2000);
+    toast({ hline:'水平线模式 · 点击图表放置', tline:'趋势线即将推出', rect:'矩形即将推出' }[mode] || mode, mode==='hline', 2000);
 }
 
 function toggleMagnet(){
   _magnetMode = !_magnetMode;
   document.getElementById('draw-magnet').classList.toggle('on', _magnetMode);
-  toast(_magnetMode ? window.i18n.t('magnetOn') : window.i18n.t('magnetOff'), _magnetMode, 1500);
+  toast(_magnetMode ? '磁吸模式 ON' : '磁吸模式 OFF', _magnetMode, 1500);
 }
 
 function undoLastDrawing(){
-  if (!_drawnLines.length){ toast(window.i18n.t('noUndo')); return; }
+  if (!_drawnLines.length){ toast('没有可撤销的绘图'); return; }
   const last = _drawnLines.pop();
   try { last.series.removePriceLine(last.priceLine); } catch{}
 }
@@ -1907,7 +1991,7 @@ function undoLastDrawing(){
 function clearDrawings(){
   _drawnLines.forEach(d => { try { d.series.removePriceLine(d.priceLine); } catch{} });
   _drawnLines = [];
-  toast(window.i18n.t('clearedAll'), true, 1500);
+  toast('已清除所有绘图', true, 1500);
 }
 
 function bindDrawingClick(){
@@ -1928,7 +2012,7 @@ function bindDrawingClick(){
       _drawnLines.push({ series: S.candles, priceLine: pl });
       return;
     }
-    toast({ tline:window.i18n.t('tlineMode'), rect:window.i18n.t('rectMode') }[_drawMode] || '', false, 2000);
+    toast({ tline:'趋势线即将推出 · Coming soon', rect:'矩形即将推出 · Coming soon' }[_drawMode] || '', false, 2000);
   });
 }
 
@@ -1969,7 +2053,7 @@ function savePrefs(){
   localStorage.setItem('iai_prefs', JSON.stringify(prefs));
   // EMA lines fully removed
   closeUserPanel();
-  toast(window.i18n.t('settingsSaved'), true, 2000);
+  toast('设置已保存 · Saved', true, 2000);
 }
 
 // ── EXPORT ───────────────────────────────────────────────────────
@@ -1989,6 +2073,5 @@ function exportCSV(){
   a.download=`${S.sym}_${S.tf}_signals.csv`;a.click();
 }
 </script>
-<script src="/qr_data.js"></script>
 </body>
 </html>
